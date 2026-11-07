@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+/*
+ * SAVORA design tokens.
+ * Warm paper surfaces, deep forest ink, and three status hues that carry
+ * meaning (fresh / use soon / past date). Text pairs meet WCAG AA (≥ 4.5:1).
+ */
+@theme {
+  --color-paper: #f5f1e8;
+  --color-paper-deep: #ede7da;
+  --color-card: #fbf9f4;
+  --color-line: #e2dbcc;
+  --color-line-strong: #cbc1ad;
+
+  --color-ink: #18211c;
+  --color-ink-2: #414b44;
+  --color-muted: #646d66;
+  --color-faint: #8a918a;
+
+  --color-forest: #1e3a2b;
+  --color-forest-deep: #142a1e;
+  --color-forest-mid: #2f5a41;
+  --color-forest-soft: #dfe8da;
+  --color-forest-wash: #ebf0e6;
+
+  --color-chart: #5a8f4e;
+  --color-saffron: #c98a2b;
+  --color-saffron-soft: #f3e3c3;
+
+  --color-fresh: #3e6b45;
+  --color-fresh-soft: #e4ecdf;
+  --color-soon: #8a5410;
+  --color-soon-soft: #f5e6c8;
+  --color-expired: #9a3a26;
+  --color-expired-soft: #f3dcd3;
+
+  --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --shadow-soft: 0 1px 2px rgb(24 33 28 / 0.04), 0 4px 16px -6px rgb(24 33 28 / 0.08);
+  --shadow-lift: 0 2px 4px rgb(24 33 28 / 0.05), 0 18px 40px -16px rgb(24 33 28 / 0.22);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-rise: rise 420ms var(--ease-out-soft) both;
+  --animate-fade: fade 240ms ease-out both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    color: var(--color-ink);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-forest-soft);
+    color: var(--color-forest-deep);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-forest-mid);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  button,
+  [role="button"],
+  summary,
+  label[for],
+  select {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.55;
+    cursor: pointer;
+  }
+
+  dialog::backdrop {
+    background: rgb(20 42 30 / 0.32);
+    backdrop-filter: blur(2px);
+  }
+}
+
+@layer components {
+  /* Small uppercase label used for section eyebrows and data captions. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Subtle paper grain for large brand surfaces (landing, auth). */
+  .grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.13 0 0 0 0 0.11 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* Savi companion */
+.savi-face {
+  scale: var(--face, 1) 1;
+  rotate: var(--tilt, 0deg);
+  translate: 0 var(--lean, 0px);
+  transform-origin: 50% 100%;
+  transition: scale 260ms ease-out, rotate 320ms ease-out, translate 320ms ease-out;
+}
+.savi-sprite { transform-origin: 50% 100%; filter: drop-shadow(0 6px 10px rgb(20 42 30 / 0.18)); }
+.savi-fx { animation: savi-fx 1.5s ease-out forwards; }
+.savi-fx-loop { animation: savi-fx 2.4s ease-out infinite; }
+@keyframes savi-fx {
+  0% { opacity: 0; translate: 0 6px; }
+  20% { opacity: 1; }
+  100% { opacity: 0; translate: 0 -34px; }
+}
+/* Gentle idle float for large, static displays of Savi (profile page, landing). */
+.savi-float { animation: savi-float 4s ease-in-out infinite; }
+@keyframes savi-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

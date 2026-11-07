@@ -1,0 +1,16 @@
+import { LogoMark } from "@/components/brand/logo";
+import { LinkButton } from "@/components/ui/button";
+
+export default function NotFound() {
+  return (
+    <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
+      <LogoMark className="mb-8 size-12" />
+      <p className="eyebrow mb-3">404</p>
+      <h1 className="text-4xl font-normal">This shelf is empty.</h1>
+      <p className="mt-3 max-w-sm text-muted">The page you’re looking for doesn’t exist or has moved.</p>
+      <LinkButton href="/" className="mt-8">
+        Back to Savora
+      </LinkButton>
+    </main>
+  );
+}

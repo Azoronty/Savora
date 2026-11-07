@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Savora — NOTAR Academy hackathon presentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  /* Source for submission/SAVORA-presentation.pdf. Render with scripts/build-presentation.mjs. */
+  @page { size: 1920px 1080px; margin: 0; }
+  :root {
+    --paper: #f5f1e8; --paper-deep: #ede7da; --card: #fbf9f4; --line: #e2dbcc; --line-strong: #cbc1ad;
+    --ink: #18211c; --ink-2: #414b44; --muted: #646d66;
+    --forest: #1e3a2b; --forest-deep: #142a1e; --forest-mid: #2f5a41; --forest-soft: #dfe8da;
+    --saffron: #c98a2b; --saffron-soft: #f3e3c3; --soon: #8a5410; --expired: #9a3a26; --fresh: #3e6b45;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #ccc; }
+  body { font-family: "Instrument Sans", system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .slide {
+    width: 1920px; height: 1080px; position: relative; overflow: hidden;
+    background: var(--paper); page-break-after: always; break-after: page;
+    padding: 96px 120px;
+  }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+  h1, h2, h3 { font-family: "Fraunces", Georgia, serif; font-weight: 300; letter-spacing: -0.02em; color: var(--ink); }
+  h2 { font-size: 76px; line-height: 1.02; }
+  h3 { font-size: 34px; font-weight: 400; line-height: 1.15; }
+  p { font-size: 26px; line-height: 1.5; color: var(--ink-2); }
+  .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 18px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 14px; }
+  .eyebrow::before { content: ""; width: 36px; height: 2px; background: var(--saffron); }
+  .num { font-family: "JetBrains Mono", monospace; font-size: 18px; color: var(--saffron); }
+  .foot { position: absolute; left: 120px; right: 120px; bottom: 48px; display: flex; justify-content: space-between; font-family: "JetBrains Mono", monospace; font-size: 15px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .dark .foot { color: rgba(251,249,244,.5); }
+  .logo { display: inline-flex; align-items: center; gap: 16px; font-family: "Fraunces", serif; font-size: 44px; font-weight: 500; letter-spacing: -0.02em; }
+  .logo svg { width: 52px; height: 52px; }
+  .shot { border-radius: 20px; border: 1px solid var(--line); box-shadow: 0 2px 4px rgba(24,33,28,.05), 0 30px 60px -24px rgba(24,33,28,.28); display: block; }
+  .phone { border-radius: 36px; border: 10px solid var(--forest-deep); box-shadow: 0 30px 60px -20px rgba(24,33,28,.35); display: block; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: 999px; font-size: 18px; font-weight: 500; }
+  .pill i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 40px; }
+  .dark { background: var(--forest); color: var(--card); }
+  .dark h2, .dark h3 { color: var(--card); }
+  .dark p { color: rgba(251,249,244,.75); }
+  .dark .eyebrow { color: rgba(251,249,244,.6); }
+</style>
+</head>
+<body>
+
+<!-- 1 · Cover -->
+<section class="slide" style="padding:0; display:grid; grid-template-columns: 1fr 1fr;">
+  <div style="padding:96px 120px; display:flex; flex-direction:column;">
+    <img src="../../public/brand/wordmark.webp" alt="SAVORA" style="height:72px; width:auto; align-self:flex-start;" />
+    <div style="margin-top:auto;">
+      <p class="eyebrow" style="margin-bottom:36px;">Household food management</p>
+      <h1 style="font-size:124px; line-height:.96;">Know your kitchen.<br/><em style="font-style:italic; font-weight:400; color:var(--forest-mid);">Waste less of it.</em></h1>
+      <p style="margin-top:40px; max-width:720px; font-size:30px;">An app that tracks the food a household already has, shows what needs using first, and suggests meals built around it.</p>
+    </div>
+    <div style="margin-top:72px; font-family:'JetBrains Mono',monospace; font-size:16px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);">NOTAR Academy hackathon · Food waste at home · November 2026</div>
+  </div>
+  <div style="position:relative;">
+    <img src="../../public/images/hero-kitchen.jpg" alt="" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:left;" />
+  </div>
+</section>
+
+<!-- 2 · Problem -->
+<section class="slide">
+  <p class="eyebrow">The problem</p>
+  <div style="display:grid; grid-template-columns: 640px 1fr; gap:120px; margin-top:48px;">
+    <h2>Most food waste at home starts with forgetting.</h2>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:56px 64px; padding-top:12px;">
+      <div style="border-top:2px solid var(--line-strong); padding-top:24px;"><span class="num">01</span><h3 style="margin:12px 0 12px;">Out of sight</h3><p>Food at the back of the fridge or pantry is forgotten until it can't be used.</p></div>
+      <div style="border-top:2px solid var(--line-strong); padding-top:24px;"><span class="num">02</span><h3 style="margin:12px 0 12px;">Dates slip past</h3><p>Nobody keeps every expiry date in their head, so the deadline passes unnoticed.</p></div>
+      <div style="border-top:2px solid var(--line-strong); padding-top:24px;"><span class="num">03</span><h3 style="margin:12px 0 12px;">Duplicate buying</h3><p>Without a clear view of home, people buy a second pack of something they already own.</p></div>
+      <div style="border-top:2px solid var(--line-strong); padding-top:24px;"><span class="num">04</span><h3 style="margin:12px 0 12px;">No plan to use it</h3><p>Ingredients need a meal to go into. Without one, they wait until they're past using.</p></div>
+    </div>
+  </div>
+  <p style="position:absolute; left:120px; bottom:110px; max-width:1100px; font-size:22px; color:var(--muted);">The result is money spent on food that ends up in the bin, and more household waste.</p>
+  <div class="foot"><span>Savora</span><span>02</span></div>
+</section>
+
+<!-- 3 · Audience -->
+<section class="slide">
+  <p class="eyebrow">Who it's for</p>
+  <h2 style="margin-top:40px; max-width:1300px;">People who shop for a household and cook at home most weeks.</h2>
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:32px; margin-top:80px;">
+    <div class="card"><h3>Families</h3><p style="margin-top:16px;">Several people eat from one fridge. Nobody has the full picture of what's there or what's already open.</p></div>
+    <div class="card"><h3>Shared flats &amp; couples</h3><p style="margin-top:16px;">Two or more shoppers buy separately, so duplicates and forgotten items are common.</p></div>
+    <div class="card"><h3>Busy weekly shoppers</h3><p style="margin-top:16px;">One big shop a week means fresh food has to be used in the right order, and that's easy to lose track of.</p></div>
+  </div>
+  <p style="margin-top:56px; max-width:1300px;">What they share: they want to spend less on food that goes unused, and they don't have time for a complicated tracking system.</p>
+  <div class="foot"><span>Savora</span><span>03</span></div>
+</section>
+
+<!-- 4 · Solution -->
+<section class="slide dark">
+  <p class="eyebrow">The solution</p>
+  <h2 style="margin-top:40px; max-width:1400px;">One inventory for the whole kitchen, and three habits built on it.</h2>
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-top:96px; background:rgba(251,249,244,.12); border-radius:24px; overflow:hidden;">
+    <div style="background:var(--forest); padding:48px;"><span class="num">01</span><h3 style="margin-top:28px;">Know what you have</h3><p style="margin-top:16px;">Fridge, freezer and pantry in one list. Adding an item takes a few seconds because Savora fills in the details.</p></div>
+    <div style="background:var(--forest); padding:48px;"><span class="num">02</span><h3 style="margin-top:28px;">Use it in time</h3><p style="margin-top:16px;">Clear expiry states, a seven-day timeline and meal ideas ranked by what expires first.</p></div>
+    <div style="background:var(--forest); padding:48px;"><span class="num">03</span><h3 style="margin-top:28px;">Buy only what's needed</h3><p style="margin-top:16px;">A shopping list that blocks duplicates and warns when something is already at home.</p></div>
+  </div>
+  <p style="margin-top:56px; max-width:1300px;">When food is thrown away anyway, the waste log records why, so households can see where waste comes from.</p>
+  <div class="foot"><span>Savora</span><span>04</span></div>
+</section>
+
+<!-- 5 · Key features -->
+<section class="slide">
+  <p class="eyebrow">Key features</p>
+  <h2 style="margin-top:40px;">Five connected tools.</h2>
+  <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:24px; margin-top:72px;">
+    <div class="card" style="padding:32px;"><span class="num">Inventory</span><h3 style="margin:20px 0 14px; font-size:30px;">Fast entry</h3><p style="font-size:21px;">Type "spinach" and the category, storage, unit and a typical date are filled in. Search, filter and sort.</p></div>
+    <div class="card" style="padding:32px;"><span class="num">Expiry</span><h3 style="margin:20px 0 14px; font-size:30px;">Clear states</h3><p style="font-size:21px;">Fresh, Use soon (≤ 3 days) and Past date, with a seven-day timeline and a use-soon view.</p>
+      <div style="display:flex; flex-direction:column; gap:10px; margin-top:22px;">
+        <span class="pill" style="background:#e4ecdf; color:var(--fresh);"><i style="background:var(--fresh)"></i>Fresh</span>
+        <span class="pill" style="background:#f5e6c8; color:var(--soon);"><i style="background:var(--saffron)"></i>Use soon</span>
+        <span class="pill" style="background:#f3dcd3; color:var(--expired);"><i style="background:var(--expired)"></i>Past date</span>
+      </div></div>
+    <div class="card" style="padding:32px;"><span class="num">Meals</span><h3 style="margin:20px 0 14px; font-size:30px;">Explained suggestions</h3><p style="font-size:21px;">24 recipes ranked by urgency and coverage, with matched and missing ingredients and a reason for each.</p></div>
+    <div class="card" style="padding:32px;"><span class="num">Shopping</span><h3 style="margin:20px 0 14px; font-size:30px;">No duplicates</h3><p style="font-size:21px;">Adds missing recipe ingredients, warns about stock at home, and moves bought items into the inventory.</p></div>
+    <div class="card" style="padding:32px;"><span class="num">Waste log</span><h3 style="margin:20px 0 14px; font-size:30px;">Real numbers</h3><p style="font-size:21px;">Quantity, reason, date and cost when known. Trends and categories come only from logged entries.</p></div>
+  </div>
+  <div class="foot"><span>Savora</span><span>05</span></div>
+</section>
+
+<!-- 6 · Product: dashboard -->
+<section class="slide" style="padding:80px 120px;">
+  <div style="display:grid; grid-template-columns: 430px 1fr; gap:72px; height:100%;">
+    <div style="padding-top:16px;">
+      <p class="eyebrow">Product</p>
+      <h2 style="margin-top:32px; font-size:64px;">The dashboard answers one question: what needs using?</h2>
+      <p style="margin-top:32px; font-size:23px;">The headline, the four figures and the week-ahead timeline all come from the household's data. Meal ideas and notes below it are generated from the same inventory.</p>
+      <p style="margin-top:24px; font-size:19px; color:var(--muted);">Screenshot of the working app with the demo kitchen.</p>
+    </div>
+    <img class="shot" src="assets/dashboard.png" alt="Savora dashboard" style="width:100%; align-self:start;" />
+  </div>
+  <div class="foot"><span>Savora</span><span>06</span></div>
+</section>
+
+<!-- 7 · Product: flows -->
+<section class="slide" style="padding:80px 120px;">
+  <p class="eyebrow">Product</p>
+  <h2 style="margin-top:28px; font-size:60px;">Add in seconds. Cook what expires first.</h2>
+  <div style="display:grid; grid-template-columns: 1fr 1fr 300px; gap:40px; margin-top:56px; align-items:start;">
+    <div><img class="shot" src="assets/add-product.png" alt="Add product with autofill" style="width:100%;" /><p style="margin-top:20px; font-size:20px;">Quick add fills in details from a catalog of about 90 foods.</p></div>
+    <div><img class="shot" src="assets/recipe.png" alt="Recipe with reasons" style="width:100%;" /><p style="margin-top:20px; font-size:20px;">Each recipe shows what's in stock, what's missing, and why it was suggested.</p></div>
+    <div><img class="phone" src="assets/mobile-inventory.png" alt="Mobile inventory" style="width:100%;" /><p style="margin-top:20px; font-size:20px;">Fully responsive, with bottom navigation on phones.</p></div>
+  </div>
+  <div class="foot"><span>Savora</span><span>07</span></div>
+</section>
+
+<!-- 8 · Architecture -->
+<section class="slide">
+  <p class="eyebrow">Technical architecture</p>
+  <h2 style="margin-top:32px; font-size:64px;">A real backend, secured in the database.</h2>
+  <div style="display:grid; grid-template-columns: 1fr 1.45fr 1fr; gap:36px; margin-top:64px; align-items:stretch;">
+    <div class="card" style="padding:32px;">
+      <span class="num">Browser</span>
+      <h3 style="margin:18px 0 18px; font-size:30px;">React client</h3>
+      <p style="font-size:20px;">Forms, sheets and filters. Filters live in the URL. Native &lt;dialog&gt; for accessible modals.</p>
+    </div>
+    <div class="card" style="padding:32px; background:var(--forest); border-color:var(--forest);">
+      <span class="num">Next.js 16 on Vercel</span>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:20px;">
+        <div style="background:rgba(251,249,244,.08); border-radius:14px; padding:18px;"><h3 style="font-size:24px; color:var(--card);">proxy.ts</h3><p style="font-size:17px; color:rgba(251,249,244,.75); margin-top:6px;">Session refresh, route guard</p></div>
+        <div style="background:rgba(251,249,244,.08); border-radius:14px; padding:18px;"><h3 style="font-size:24px; color:var(--card);">Server Components</h3><p style="font-size:17px; color:rgba(251,249,244,.75); margin-top:6px;">Reads through a data layer</p></div>
+        <div style="background:rgba(251,249,244,.08); border-radius:14px; padding:18px;"><h3 style="font-size:24px; color:var(--card);">Server Actions</h3><p style="font-size:17px; color:rgba(251,249,244,.75); margin-top:6px;">Zod validation, typed results</p></div>
+        <div style="background:rgba(251,249,244,.08); border-radius:14px; padding:18px;"><h3 style="font-size:24px; color:var(--card);">Domain logic</h3><p style="font-size:17px; color:rgba(251,249,244,.75); margin-top:6px;">Expiry, ranking, stats (unit-tested)</p></div>
+      </div>
+    </div>
+    <div class="card" style="padding:32px;">
+      <span class="num">Supabase</span>
+      <h3 style="margin:18px 0 18px; font-size:30px;">Postgres + Auth</h3>
+      <p style="font-size:20px;">Row Level Security on every table. Atomic RPC functions for discard, consume and put-away.</p>
+    </div>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:24px; margin-top:24px;">
+    <div style="border-top:2px solid var(--line-strong); padding-top:18px;"><h3 style="font-size:24px;">User JWT on every query</h3><p style="font-size:19px; margin-top:6px;">Only the publishable key is used. No service-role key exists in the app.</p></div>
+    <div style="border-top:2px solid var(--line-strong); padding-top:18px;"><h3 style="font-size:24px;">Constraints &amp; indexes</h3><p style="font-size:19px; margin-top:6px;">Enums, checks, date columns, a unique index that blocks duplicate list items.</p></div>
+    <div style="border-top:2px solid var(--line-strong); padding-top:18px;"><h3 style="font-size:24px;">Date-only logic</h3><p style="font-size:19px; margin-top:6px;">Whole-day arithmetic in the viewer's time zone. No off-by-one errors.</p></div>
+    <div style="border-top:2px solid var(--line-strong); padding-top:18px;"><h3 style="font-size:24px;">Tested</h3><p style="font-size:19px; margin-top:6px;">53 unit tests and a 16-step Playwright end-to-end run.</p></div>
+  </div>
+  <div class="foot"><span>Savora</span><span>08</span></div>
+</section>
+
+<!-- 9 · Product value -->
+<section class="slide">
+  <p class="eyebrow">Product value</p>
+  <h2 style="margin-top:32px; max-width:1400px;">Each cause of waste has a feature that answers it.</h2>
+  <div style="margin-top:64px; border-top:2px solid var(--ink);">
+    <div style="display:grid; grid-template-columns:420px 1fr; padding:26px 0; border-bottom:1px solid var(--line-strong);"><h3 style="font-size:30px;">Forgotten food</h3><p>One inventory for fridge, freezer and pantry, sorted by date, with a seven-day timeline on the dashboard.</p></div>
+    <div style="display:grid; grid-template-columns:420px 1fr; padding:26px 0; border-bottom:1px solid var(--line-strong);"><h3 style="font-size:30px;">Missed dates</h3><p>Use-soon states and badges, a dedicated view, and notes such as "cook or freeze the chicken thighs".</p></div>
+    <div style="display:grid; grid-template-columns:420px 1fr; padding:26px 0; border-bottom:1px solid var(--line-strong);"><h3 style="font-size:30px;">Duplicate purchases</h3><p>The shopping list blocks repeat entries and shows what's already at home while you type.</p></div>
+    <div style="display:grid; grid-template-columns:420px 1fr; padding:26px 0; border-bottom:1px solid var(--line-strong);"><h3 style="font-size:30px;">No meal plan</h3><p>Recipes ranked by what expires first, with missing ingredients added to the list in one tap.</p></div>
+    <div style="display:grid; grid-template-columns:420px 1fr; padding:26px 0; border-bottom:1px solid var(--line-strong);"><h3 style="font-size:30px;">Not knowing the pattern</h3><p>A waste log with reasons, categories, trends and cost, calculated only from what was recorded.</p></div>
+  </div>
+  <div class="foot"><span>Savora</span><span>09</span></div>
+</section>
+
+<!-- 10 · Closing -->
+<section class="slide dark" style="display:flex; flex-direction:column; justify-content:center;">
+  <img src="../../public/brand/wordmark-light.webp" alt="SAVORA" style="height:72px; width:auto; align-self:flex-start;" />
+  <h2 style="margin-top:56px; font-size:100px; max-width:1500px;">The food you already have is the easiest food to save.</h2>
+  <p style="margin-top:44px; max-width:1100px; font-size:28px;">Savora is a working product: a real database with row-level security, an explainable recommendation engine, and an interface designed for everyday use on any screen.</p>
+  <div style="margin-top:64px; display:flex; gap:64px; font-family:'JetBrains Mono',monospace; font-size:20px; letter-spacing:.06em; color:rgba(251,249,244,.85);">
+    <span id="live-url">Live demo: savora-mauve.vercel.app</span>
+    <span>github.com/Azoronty/Savora</span>
+  </div>
+  <div class="foot"><span>NOTAR Academy hackathon · November 2026</span><span>10</span></div>
+</section>
+
+</body>
+</html>

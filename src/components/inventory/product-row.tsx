@@ -1,0 +1,71 @@
+import { Archive, Refrigerator, Snowflake } from "lucide-react";
+import { CATEGORY_LABEL, STORAGE_LABEL, type Storage } from "@/lib/domain/constants";
+import { formatShortDate } from "@/lib/domain/dates";
+import { getExpiry } from "@/lib/domain/expiry";
+import { formatQuantity } from "@/lib/domain/format";
+import type { Product } from "@/lib/data/queries";
+import type { WasteRisk } from "@/lib/domain/predict";
+import { cx } from "@/lib/cx";
+import { CategoryIcon } from "@/components/ui/category-icon";
+import { FreshnessBar, StatusPill } from "@/components/ui/status";
+import { ProductActions } from "./product-actions";
+
+const STORAGE_ICON: Record<Storage, typeof Refrigerator> = { fridge: Refrigerator, freezer: Snowflake, pantry: Archive };
+
+export function SampleTag() {
+  return (
+    <span className="rounded-sm border border-saffron/40 bg-saffron-soft/50 px-1.5 font-mono text-[0.625rem] uppercase leading-4 tracking-wider text-soon">
+      Sample
+    </span>
+  );
+}
+
+export function ProductRow({ product, today, risk }: { product: Product; today: string; risk?: WasteRisk }) {
+  const expiry = getExpiry(product.expires_on, today);
+  const StorageIcon = STORAGE_ICON[product.storage];
+  return (
+    <li data-savi-product={product.name} className="group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-4 py-3.5 transition-colors hover:bg-white/60 sm:grid-cols-[auto_minmax(0,1fr)_8.5rem_7rem_auto] sm:px-5">
+      <CategoryIcon category={product.category} />
+      <div className="min-w-0">
+        <div className="flex items-center gap-2">
+          <p className="truncate font-medium">{product.name}</p>
+          {product.is_demo && <SampleTag />}
+          {risk && (
+            <span
+              title={risk.reason}
+              className={cx(
+                "hidden shrink-0 rounded-sm px-1.5 text-[0.6875rem] font-medium leading-4 sm:inline",
+                risk.level === "high" ? "bg-expired-soft text-expired" : "bg-soon-soft text-soon",
+              )}
+            >
+              May go unused
+              <span className="sr-only">: {risk.reason}</span>
+            </span>
+          )}
+        </div>
+        <p className="mt-0.5 flex items-center gap-1.5 truncate text-[0.8125rem] text-muted">
+          <span className="tabular">{formatQuantity(Number(product.quantity), product.unit)}</span>
+          <span aria-hidden="true">·</span>
+          <StorageIcon className="size-3.5 shrink-0" aria-hidden="true" />
+          <span>{STORAGE_LABEL[product.storage]}</span>
+          <span aria-hidden="true" className="hidden md:inline">·</span>
+          <span className="hidden md:inline">{CATEGORY_LABEL[product.category]}</span>
+        </p>
+        {/* Mobile: date + status under the name */}
+        <p className="mt-1.5 flex items-center gap-2 text-[0.8125rem] sm:hidden">
+          <StatusPill status={expiry.status} />
+          <span className={cx("tabular", expiry.status === "fresh" ? "text-muted" : "text-ink-2")}>{expiry.label}</span>
+        </p>
+      </div>
+      <div className="hidden sm:block">
+        <p className="font-mono text-[0.8125rem] tabular text-ink">{formatShortDate(product.expires_on)}</p>
+        <p className={cx("text-[0.8125rem]", expiry.status === "fresh" ? "text-muted" : "text-ink-2")}>{expiry.label}</p>
+        <FreshnessBar expiry={expiry} className="mt-1.5 w-20" />
+      </div>
+      <div className="hidden sm:block">
+        <StatusPill status={expiry.status} />
+      </div>
+      <ProductActions product={product} today={today} />
+    </li>
+  );
+}
