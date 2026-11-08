@@ -61,8 +61,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-line bg-paper/90 px-4 backdrop-blur-md sm:px-6 lg:hidden">
                 <Logo href="/app" />
                 <div className="flex items-center gap-2">
-                  {/* Savi's phone home: in the header chrome, never over content. */}
-                  <span data-savi-home-mobile className="block h-10 w-12" aria-hidden="true" />
                   <MobileAddButton />
                   <MobileAccountMenu viewer={viewer} />
                 </div>

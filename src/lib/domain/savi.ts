@@ -126,6 +126,17 @@ const TIPS = [
   "Every XP I earn comes from something you actually did.",
 ];
 
+/** First-visit tour: Savi walks to each nav link (by href) and explains it. Steps without href happen at home. */
+export const SAVI_TOUR: { href?: string; text: string }[] = [
+  { text: "Hi, I'm Savi! Want a quick tour of your kitchen?" },
+  { href: "/app/inventory", text: "Inventory holds everything in your fridge, freezer and pantry. Type a name and I fill in the rest." },
+  { href: "/app/expiring", text: "Use soon lists food to eat in the next 3 days. Check here first." },
+  { href: "/app/meals", text: "Meals are ranked by what expires first. \"I cooked this\" updates your stock." },
+  { href: "/app/shopping", text: "The shopping list blocks duplicates and warns when something is already at home." },
+  { href: "/app/waste", text: "If food gets thrown away, log it here to see what you lose and why." },
+  { text: "That's the tour! Tap me any time for a food-saving tip." },
+];
+
 /** Map an app event to what Savi says and does. Pure and deterministic. */
 export function reactTo(event: SaviEvent): SaviReaction {
   switch (event.type) {

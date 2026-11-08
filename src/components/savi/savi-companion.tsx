@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   SAVI_MISSIONS,
+  SAVI_TOUR,
   reactTo,
   saviProgress,
   shouldSpeak,
@@ -76,6 +77,8 @@ export function SaviProvider({ data, children }: { data: SaviContextData; childr
   );
 }
 
+type Behaviour = [name: string, weight: number, act: () => Promise<unknown> | void];
+
 type Fx = { id: number; kind: "heart" | "spark" | "zzz" | "question" | "xp"; text?: string };
 
 function SaviCompanion({ data, register }: { data: SaviContextData; register: (fn: (e: SaviEvent) => void) => void }) {
@@ -95,6 +98,10 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
   const [fx, setFx] = useState<Fx[]>([]);
   const [shownStage, setShownStage] = useState(stage.n);
   const [peeking, setPeeking] = useState(false);
+  const [tourStep, setTourStep] = useState<number | null>(null);
+  // Bubbles open towards the middle of the screen so they never run off the edge.
+  const [bubbleRight, setBubbleRight] = useState(false);
+  const tourAnswer = useRef<((go: boolean) => void) | null>(null);
   const pos = useRef({ x: 0, y: 0 });
   const facing = useRef(1);
   const lastInput = useRef(0);
@@ -107,7 +114,7 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
   const inspectTarget = useRef<string | undefined>(undefined);
   const lastBehaviour = useRef("");
 
-  const height = desktop ? 70 + (stage.n - 1) * 5 : 40 + (stage.n - 1) * 1.5;
+  const height = desktop ? 70 + (stage.n - 1) * 5 : 46 + (stage.n - 1) * 2;
 
   /* ---------- environment ---------- */
   useEffect(() => {
@@ -145,10 +152,12 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
       const r = zone.getBoundingClientRect();
       return { x: r.left + r.width * 0.3, y: r.bottom - 6, minX: r.left + 44, maxX: r.right - 44 };
     }
-    const spot = document.querySelector<HTMLElement>("[data-savi-home-mobile]")?.getBoundingClientRect();
-    const x = spot ? spot.left + spot.width / 2 : window.innerWidth - 40;
-    const y = spot ? spot.bottom + 2 : 60;
-    return { x, y, minX: x, maxX: x };
+    // Phones: Savi stands on the top edge of the bottom navigation and walks along it.
+    const nav = document.querySelector<HTMLElement>("nav[aria-label='Main'].fixed")?.getBoundingClientRect();
+    const y = nav ? nav.top + 1 : window.innerHeight - 64;
+    const minX = (nav?.left ?? 0) + 32;
+    const maxX = (nav?.right ?? window.innerWidth) - 32;
+    return { x: maxX - 24, y, minX, maxX };
   }, [desktop]);
 
   const place = useCallback((x: number, y: number) => {
@@ -157,11 +166,14 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
     if (el) el.style.transform = `translate(${x}px, ${y}px)`;
     puppet.current?.wake();
   }, []);
+  const aimBubble = useCallback(() => setBubbleRight(pos.current.x > window.innerWidth / 2), []);
 
   useEffect(() => {
+    // Keep Savi where it is along its zone (phones resize as the address bar hides); start at home.
     const fit = () => {
       const h = home();
-      place(h.x, h.y);
+      const x = pos.current.x ? Math.min(h.maxX, Math.max(h.minX, pos.current.x)) : h.x;
+      place(x, h.y);
     };
     fit();
     window.addEventListener("resize", fit);
@@ -426,6 +438,42 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
     [addFx, body$, inspectProduct, jumpInPlace, reduced, stage.n],
   );
 
+  /* ---------- first-visit tour ---------- */
+  const runTour = useCallback(async () => {
+    busy.current = true;
+    setAsleep(false);
+    const visible = (href: string) =>
+      [...document.querySelectorAll<HTMLElement>(`nav[aria-label='Main'] a[href="${href}"]`)].find((a) => a.getBoundingClientRect().width > 0);
+    const goTo = async (el?: HTMLElement) => {
+      const h = home();
+      if (!el) return desktop ? hopTo(h.x, h.y) : travel(h.x, h.y, "walk");
+      const r = el.getBoundingClientRect();
+      if (desktop) {
+        // Stand just outside the sidebar, level with the link, and face it.
+        await hopTo((el.closest("aside")?.getBoundingClientRect().right ?? r.right) + 30, r.bottom - 2);
+        face(-1);
+      } else {
+        await travel(Math.min(h.maxX, Math.max(h.minX, r.left + r.width / 2)), h.y, "walk");
+      }
+    };
+    for (let i = 0; i < SAVI_TOUR.length; i++) {
+      const step = SAVI_TOUR[i];
+      const el = step.href ? visible(step.href) : undefined;
+      if (step.href && !el) continue; // e.g. "Use soon" is not in the phone navigation
+      if (el || i === SAVI_TOUR.length - 1) await goTo(el);
+      if (el) el.style.backgroundColor = "var(--color-saffron-soft)";
+      aimBubble();
+      setTourStep(i);
+      const go = await new Promise<boolean>((resolve) => (tourAnswer.current = resolve));
+      if (el) el.style.backgroundColor = "";
+      setTourStep(null);
+      if (!go) break;
+    }
+    await goTo();
+    save(`${keyBase}:tour`, true);
+    busy.current = false;
+  }, [aimBubble, desktop, face, home, hopTo, keyBase, travel]);
+
   /* ---------- speech ---------- */
   const dismiss = useCallback(() => {
     clearTimeout(hideTimer.current);
@@ -450,12 +498,13 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
       st.lastByKey = { ...st.lastByKey, [reaction.key]: now };
       if (reaction.priority === "ambient") st.lastAmbientAt = now;
       save(`${keyBase}:said`, st.lastByKey);
+      aimBubble();
       setSpeech(reaction);
       void play(reaction.animation);
       clearTimeout(hideTimer.current);
       hideTimer.current = setTimeout(dismiss, reaction.priority === "milestone" ? BUBBLE_MS + 3000 : BUBBLE_MS);
     },
-    [data.mode, dismiss, keyBase, play],
+    [aimBubble, data.mode, dismiss, keyBase, play],
   );
 
   useEffect(() => register(handle), [handle, register]);
@@ -490,17 +539,29 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
   /* ---------- contextual hints on each page ---------- */
   useEffect(() => {
     const t = setTimeout(() => {
+      if (pathname === "/app" && data.mode === "full" && !load(`${keyBase}:tour`, false)) {
+        save(`${keyBase}:welcomed`, true);
+        return void runTour();
+      }
       if (!load(`${keyBase}:welcomed`, false)) {
         save(`${keyBase}:welcomed`, true);
         return handle({ type: "welcome" });
       }
       if (data.productCount === 0) handle({ type: "empty_inventory" });
-      else if (data.expiring.count > 0) handle({ type: "expiring", ...data.expiring });
-      else if (data.readyRecipe) handle({ type: "recipe_match", ...data.readyRecipe });
+      else if (data.expiring.count > 0) {
+        handle({ type: "expiring", ...data.expiring });
+        // When the hint is spoken on a page that lists products, go and point at the first one.
+        const spoke = (speechState.current.lastByKey.expiring ?? 0) > Date.now() - 1000;
+        if (spoke && desktop && (pathname === "/app/inventory" || pathname === "/app/expiring")) {
+          inspectTarget.current = data.expiring.names[0];
+          void play("inspect");
+        }
+      } else if (data.readyRecipe) handle({ type: "recipe_match", ...data.readyRecipe });
     }, 3500);
     return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per page view
-  }, [pathname]);
+    // Once per page view; `desktop` is listed so the timer is rescheduled with the real layout after mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, desktop]);
 
   /* ---------- cursor awareness (desktop), idle, wandering ---------- */
   useEffect(() => {
@@ -538,22 +599,23 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
         return;
       }
       if (reduced || asleep || quietFor < 4000) return;
-      if (!desktop) {
-        if (Math.random() < 0.18) void play("hop");
-        return;
-      }
       // Weighted, never the same behaviour twice in a row, and often nothing at all.
       const h = home();
+      if (Math.abs(pos.current.y - h.y) > 2) place(pos.current.x, h.y);
       const spot = () => h.minX + Math.random() * (h.maxX - h.minX);
-      const options: [string, number, () => Promise<unknown> | void][] = [
+      const options: Behaviour[] = [
         ["walk", 0.2, () => travel(spot(), h.y, "walk")],
         ["run", 0.07, () => travel(pos.current.x < (h.minX + h.maxX) / 2 ? h.maxX : h.minX, h.y, "run")],
         ["roll", 0.08, () => rollTo(pos.current.x < (h.minX + h.maxX) / 2 ? h.maxX : h.minX)],
         ["jump", 0.08, () => hopTo(spot(), h.y)],
         ["look", 0.12, lookAround],
         ["hide", 0.06, hideAndPeek],
-        ["peek", 0.06, peek],
-        ["inspect", 0.06, () => inspectProduct()],
+        ...(desktop
+          ? ([
+              ["peek", 0.06, peek],
+              ["inspect", 0.06, () => inspectProduct()],
+            ] as Behaviour[])
+          : []),
       ];
       let r = Math.random();
       for (const [name, weight, act] of options) {
@@ -606,7 +668,6 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
     handle({ type: "pet", tip: tipIndex.current++ });
   };
 
-  const bubbleSide = desktop ? "left-0" : "right-0";
   const label = useMemo(() => `Savi, your kitchen companion. Stage ${stage.n}: ${stage.name}. ${data.xp} XP.`, [stage, data.xp]);
 
   return (
@@ -616,16 +677,53 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
         className="absolute left-0 top-0 will-change-transform"
         style={{ clipPath: peeking ? "inset(0 0 0 var(--peek-clip, 100%))" : undefined }}
       >
+        {/* tour bubble */}
+        {tourStep !== null && (
+          <div
+            role="dialog"
+            aria-label="Savi's tour"
+            className={cx(
+              "pointer-events-auto absolute w-max max-w-[16rem] animate-rise rounded-2xl border border-line bg-card px-4 py-3 text-sm text-ink shadow-lift",
+              bubbleRight ? "right-0 translate-x-6" : "left-0 -translate-x-6",
+            )}
+            style={{ bottom: height + 8 }}
+          >
+            <p className="leading-snug">{SAVI_TOUR[tourStep].text}</p>
+            <div className="mt-2.5 flex items-center gap-2">
+              <button
+                type="button"
+                autoFocus
+                onClick={() => tourAnswer.current?.(true)}
+                className="inline-flex h-8 items-center rounded-full bg-forest px-3 text-xs font-medium text-card hover:bg-forest-deep"
+              >
+                {tourStep === 0 ? "Show me" : tourStep === SAVI_TOUR.length - 1 ? "Done" : "Next"}
+              </button>
+              {tourStep < SAVI_TOUR.length - 1 && (
+                <button
+                  type="button"
+                  onClick={() => tourAnswer.current?.(false)}
+                  className="inline-flex h-8 items-center rounded-full px-3 text-xs font-medium text-muted hover:bg-paper-deep hover:text-ink"
+                >
+                  {tourStep === 0 ? "Not now" : "Skip tour"}
+                </button>
+              )}
+            </div>
+            <span
+              aria-hidden="true"
+              className={cx("absolute -bottom-[7px] size-3 rotate-45 border-b border-r border-line bg-card", bubbleRight ? "right-10" : "left-10")}
+            />
+          </div>
+        )}
+
         {/* bubble */}
-        {speech && (
+        {speech && tourStep === null && (
           <div
             role="status"
             className={cx(
               "pointer-events-auto absolute w-max max-w-[15rem] animate-rise rounded-2xl border border-line bg-card px-4 py-3 text-sm text-ink shadow-lift",
-              bubbleSide,
-              desktop ? "-translate-x-6" : "translate-x-12",
+              bubbleRight ? "right-0 translate-x-6" : "left-0 -translate-x-6",
             )}
-            style={desktop ? { bottom: height + 8 } : { top: 12 }}
+            style={{ bottom: height + 8 }}
             onMouseEnter={() => clearTimeout(hideTimer.current)}
             onMouseLeave={() => (hideTimer.current = setTimeout(dismiss, 3000))}
           >
@@ -663,7 +761,8 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
               aria-hidden="true"
               className={cx(
                 "absolute size-3 rotate-45 border-line bg-card",
-                desktop ? "-bottom-[7px] left-10 border-b border-r" : "-top-[7px] right-[2.6rem] border-l border-t",
+                "-bottom-[7px] border-b border-r",
+                bubbleRight ? "right-10" : "left-10",
               )}
             />
           </div>

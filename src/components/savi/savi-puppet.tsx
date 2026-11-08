@@ -1,31 +1,31 @@
 "use client";
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from "react";
-import { SaviMotion, type MotionInput } from "@/lib/domain/savi-motion";
-import { LIMBS, feetY, legLength, rigSrc, stageRig, type Limb } from "./rig";
 
 /** What animations can ask of Savi's body; tween these values, then call wake(). */
 export type PuppetDrive = { crouch: number; reach: number; lean: number; airborne: boolean };
 export type PuppetHandle = { drive: PuppetDrive; wake: () => void };
 
+/** Width / height of each stage illustration in public/savi/stage-N.webp. */
+const ASPECT = [128 / 156, 157 / 204, 177 / 248, 202 / 278, 222 / 330, 270 / 370, 276 / 367];
+
 /**
- * Savi as a DOM cut-out puppet: body and limbs as separate images, each limb
- * rotating about its joint, driven by spring physics from how fast the
- * character is moving. The animation loop runs only while something moves.
+ * Savi drawn as the whole stage illustration (the same picture as on the Savi
+ * page), animated as one piece: a step bounce and sway while moving, squash
+ * for crouching, stretch in the air, a sway for "talking". The loop runs only
+ * while something moves.
  */
 export const SaviPuppet = forwardRef<
   PuppetHandle,
   { stage: number; height: number; facing: () => number; position: () => { x: number; y: number }; still?: boolean; className?: string }
->(function SaviPuppet({ stage, height, facing, position, still = false, className }, ref) {
-  const rig = stageRig(stage);
-  const k = height / feetY(rig);
-  const limbs = LIMBS.filter((l) => rig.parts[l]);
-  const els = useRef<Partial<Record<Limb | "body" | "root", HTMLElement | null>>>({});
+>(function SaviPuppet({ stage, height, position, still = false, className }, ref) {
+  const img = useRef<HTMLImageElement>(null);
   const drive = useRef<PuppetDrive>({ crouch: 0, reach: 0, lean: 0, airborne: false });
-  const motion = useRef(new SaviMotion());
   const frame = useRef<number | null>(null);
   const awakeUntil = useRef(0);
   const last = useRef<{ t: number; x: number; y: number } | null>(null);
+  const phase = useRef(0);
+  const speed = useRef(0);
 
   const tick = useCallback(() => {
     const now = performance.now();
@@ -34,30 +34,30 @@ export const SaviPuppet = forwardRef<
     last.current = { t: now, ...p };
     const dt = Math.min(0.1, Math.max(0.001, (now - prev.t) / 1000));
     const d = drive.current;
-    const input: MotionInput = {
-      vx: (((p.x - prev.x) / dt) * facing()) / height,
-      vy: -((p.y - prev.y) / dt) / height,
-      airborne: d.airborne,
-      crouch: d.crouch,
-      reach: d.reach,
-      lean: d.lean,
-      legLength: legLength(rig),
-    };
-    const m = motion.current;
-    const pose = m.step(input, dt);
-    for (const l of limbs) {
-      const el = els.current[l];
-      if (el) el.style.rotate = `${-(rig.parts[l]!.rest + pose[l])}rad`; // CSS rotates clockwise
-    }
-    if (els.current.body) els.current.body.style.translate = `0 ${-m.bodyY * height}px`;
-    if (els.current.root) els.current.root.style.rotate = `${-pose.tilt}rad`;
-    const moving = Math.abs(input.vx) + Math.abs(input.vy) > 0.02;
-    if (moving || d.airborne || m.restlessness(input) > 0.02 || now < awakeUntil.current) frame.current = requestAnimationFrame(tick);
+    // Smoothed ground speed in body heights per second.
+    const v = Math.abs(p.x - prev.x) / dt / height;
+    speed.current += (v - speed.current) * Math.min(1, dt * 10);
+    const walking = !d.airborne && speed.current > 0.15;
+    phase.current += dt * (4 + Math.min(speed.current, 4) * 3);
+
+    const step = walking ? Math.abs(Math.sin(phase.current)) : 0;
+    const bob = step * height * Math.min(0.09, 0.03 + speed.current * 0.02);
+    const sway = (walking ? Math.sin(phase.current) * 5 : 0) + d.lean * 40 + Math.sin(now / 90) * d.reach * 6;
+    const squash = d.crouch * 0.2;
+    const sy = 1 - squash + (d.airborne ? 0.06 : 0) + step * 0.03;
+    const sx = 1 + squash * 0.6 - (d.airborne ? 0.04 : 0);
+    const el = img.current;
+    if (el) el.style.transform = `translateY(${-bob}px) rotate(${sway}deg) scale(${sx}, ${sy})`;
+
+    const busy = walking || d.airborne || d.crouch > 0.01 || d.reach > 0.01 || Math.abs(d.lean) > 0.01;
+    if (busy || now < awakeUntil.current) frame.current = requestAnimationFrame(tick);
     else {
       frame.current = null;
       last.current = null;
+      speed.current = 0;
+      if (el) el.style.transform = "";
     }
-  }, [facing, height, limbs, position, rig]);
+  }, [height, position]);
 
   const wake = useCallback(() => {
     if (still) return;
@@ -68,37 +68,18 @@ export const SaviPuppet = forwardRef<
   useImperativeHandle(ref, () => ({ drive: drive.current, wake }), [wake]);
   useEffect(() => () => void (frame.current !== null && cancelAnimationFrame(frame.current)), []);
 
-  const part = (l: Limb) => {
-    const p = rig.parts[l]!;
-    return (
-      // eslint-disable-next-line @next/next/no-img-element -- small pre-sized rig part, animated by transforms
+  const aspect = ASPECT[stage - 1] ?? ASPECT[0];
+  return (
+    <span className={className} style={{ display: "block", position: "relative", width: height * aspect, height }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- small sprite animated by transforms */}
       <img
-        key={`${stage}-${l}`}
-        ref={(el) => void (els.current[l] = el)}
-        src={rigSrc(stage, l)}
+        ref={img}
+        src={`/savi/stage-${stage}.webp`}
         alt=""
         draggable={false}
-        className="absolute max-w-none"
-        style={{
-          left: (p.jx - p.px) * k,
-          top: (p.jy - p.py) * k,
-          width: p.w * k,
-          height: p.h * k,
-          transformOrigin: `${p.px * k}px ${p.py * k}px`,
-          rotate: `${-p.rest}rad`,
-        }}
+        className="absolute inset-0 h-full w-full max-w-none"
+        style={{ transformOrigin: "50% 100%" }}
       />
-    );
-  };
-
-  return (
-    <span ref={(el) => void (els.current.root = el)} className={className} style={{ display: "block", position: "relative", width: rig.body.w * k, height, transformOrigin: "50% 100%" }}>
-      <span ref={(el) => void (els.current.body = el)} className="absolute inset-0">
-        {limbs.filter((l) => rig.parts[l]!.layer === "back").map(part)}
-        {/* eslint-disable-next-line @next/next/no-img-element -- small pre-sized rig part */}
-        <img src={rigSrc(stage, "body")} alt="" draggable={false} className="absolute left-0 top-0 max-w-none" style={{ width: rig.body.w * k, height: rig.body.h * k }} />
-        {limbs.filter((l) => rig.parts[l]!.layer === "front").map(part)}
-      </span>
     </span>
   );
 });
