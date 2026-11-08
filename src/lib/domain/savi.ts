@@ -126,14 +126,17 @@ const TIPS = [
   "Every XP I earn comes from something you actually did.",
 ];
 
-/** First-visit tour: Savi walks to each nav link (by href) and explains it. Steps without href happen at home. */
-export const SAVI_TOUR: { href?: string; text: string }[] = [
+/**
+ * First-visit tour. Steps with href: Savi walks to that nav link, the page opens and
+ * `spot` (a CSS selector on that page) is highlighted. Steps without href happen on Today.
+ */
+export const SAVI_TOUR: { href?: string; spot?: string; text: string }[] = [
   { text: "Hi, I'm Savi! Want a quick tour of your kitchen?" },
-  { href: "/app/inventory", text: "Inventory holds everything in your fridge, freezer and pantry. Type a name and I fill in the rest." },
-  { href: "/app/expiring", text: "Use soon lists food to eat in the next 3 days. Check here first." },
-  { href: "/app/meals", text: "Meals are ranked by what expires first. \"I cooked this\" updates your stock." },
-  { href: "/app/shopping", text: "The shopping list blocks duplicates and warns when something is already at home." },
-  { href: "/app/waste", text: "If food gets thrown away, log it here to see what you lose and why." },
+  { href: "/app/inventory", spot: "main ul:has(> [data-savi-product])", text: "This is your inventory: fridge, freezer and pantry in one list. Type a name and I fill in the rest." },
+  { href: "/app/expiring", spot: "main ul:has(> [data-savi-product])", text: "Use soon shows food to eat in the next 3 days, with recipes that use it. Check here first." },
+  { href: "/app/meals", spot: "main a[href^='/app/meals/']", text: "Meals are ranked by what expires first. \"I cooked this\" updates your stock." },
+  { href: "/app/shopping", spot: "main form:has(#shopping-name)", text: "Add to the shopping list here. It blocks duplicates and warns when something is already at home." },
+  { href: "/app/waste", spot: "main section[aria-label='Summary']", text: "If food gets thrown away, log it. These numbers show what you lose and why." },
   { text: "That's the tour! Tap me any time for a food-saving tip." },
 ];
 
