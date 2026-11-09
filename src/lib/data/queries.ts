@@ -198,3 +198,26 @@ export const listHistory = cache(async (viewer: Viewer, sinceDays = 120): Promis
   if (error) fail("your purchase history", error);
   return data;
 });
+
+export type ReminderState = {
+  hour: number;
+  devices: number;
+  lastSent: { kind: "daily" | "test"; sentAt: string; delivered: number; devices: number; title: string } | null;
+};
+
+/** Reminder settings and the latest reminder actually sent, as proof it works. */
+export async function listReminderState(viewer: Viewer): Promise<ReminderState> {
+  const supabase = await createClient();
+  const [profile, devices, last] = await Promise.all([
+    supabase.from("profiles").select("reminder_hour").eq("id", viewer.userId).single(),
+    supabase.from("push_subscriptions").select("id", { count: "exact", head: true }),
+    supabase.from("reminder_log").select("kind, sent_at, delivered, devices, title").order("sent_at", { ascending: false }).limit(1).maybeSingle(),
+  ]);
+  // Before the reminders migration exists these fail; the page still renders without reminders.
+  const row = last.data;
+  return {
+    hour: profile.data?.reminder_hour ?? 9,
+    devices: devices.count ?? 0,
+    lastSent: row ? { kind: row.kind as "daily" | "test", sentAt: row.sent_at, delivered: row.delivered, devices: row.devices, title: row.title } : null,
+  };
+}

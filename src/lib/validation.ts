@@ -37,6 +37,9 @@ export type ProductInput = z.input<typeof productSchema>;
 
 export const updateProductSchema = z.object({ id: uuid, values: productSchema });
 
+/** Quick add: up to 30 products saved in one go. */
+export const productBatchSchema = z.array(productSchema).min(1, "Nothing to add").max(30, "Add at most 30 items at once");
+
 export const amountSchema = z.object({ id: uuid, quantity });
 
 export const discardSchema = z.object({

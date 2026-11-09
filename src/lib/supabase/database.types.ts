@@ -185,6 +185,69 @@ export type Database = {
           },
         ]
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reminder_log: {
+        Row: {
+          delivered: number
+          devices: number
+          id: number
+          kind: string
+          local_date: string
+          sent_at: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          delivered: number
+          devices: number
+          id?: never
+          kind: string
+          local_date: string
+          sent_at?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          delivered?: number
+          devices?: number
+          id?: never
+          kind?: string
+          local_date?: string
+          sent_at?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -192,6 +255,7 @@ export type Database = {
           household_id: string
           id: string
           onboarded_at: string | null
+          reminder_hour: number
           savi_mode: Database["public"]["Enums"]["savi_mode"]
           timezone: string
           updated_at: string
@@ -202,6 +266,7 @@ export type Database = {
           household_id: string
           id: string
           onboarded_at?: string | null
+          reminder_hour?: number
           savi_mode?: Database["public"]["Enums"]["savi_mode"]
           timezone?: string
           updated_at?: string
@@ -212,6 +277,7 @@ export type Database = {
           household_id?: string
           id?: string
           onboarded_at?: string | null
+          reminder_hour?: number
           savi_mode?: Database["public"]["Enums"]["savi_mode"]
           timezone?: string
           updated_at?: string
@@ -432,6 +498,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      reminder_batch: { Args: { p_secret: string }; Returns: Json }
+      reminder_prune: { Args: { p_endpoint: string; p_secret: string }; Returns: undefined }
+      reminder_record: {
+        Args: { p_delivered: number; p_devices: number; p_local_date: string; p_secret: string; p_title: string; p_user: string }
+        Returns: undefined
+      }
+      save_push_subscription: {
+        Args: { p_auth: string; p_endpoint: string; p_p256dh: string; p_user_agent: string }
+        Returns: undefined
+      }
       clear_demo_history: { Args: never; Returns: number }
       consume_product: {
         Args: { p_product_id: string; p_quantity: number }

@@ -1,8 +1,9 @@
 "use server";
 
-import { amountSchema, discardSchema, idSchema, productSchema, updateProductSchema, type ProductInput } from "@/lib/validation";
+import { amountSchema, discardSchema, idSchema, productBatchSchema, productSchema, updateProductSchema, type ProductInput } from "@/lib/validation";
 import { getRecipe } from "@/lib/domain/recipes";
 import { itemIdentity } from "@/lib/domain/shopping";
+import { getPrediction } from "@/lib/data/predict";
 import { actionContext, refreshApp } from "./context";
 import { dbError, invalid, notSignedIn, ok, type ActionResult } from "./result";
 
@@ -20,6 +21,36 @@ export async function createProduct(input: ProductInput): Promise<ActionResult<{
   if (error) return dbError(error);
   refreshApp();
   return ok(data, `${parsed.data.name} added`);
+}
+
+const STARTER_USUALS = ["Milk", "Eggs", "Bread", "Bananas", "Tomatoes", "Chicken"];
+
+/** Foods this household buys most often (from its purchase history), for one-tap quick add. */
+export async function getUsualItems(): Promise<ActionResult<string[]>> {
+  const ctx = await actionContext();
+  if (!ctx) return notSignedIn;
+  const { patterns } = await getPrediction(ctx.viewer);
+  const top = [...patterns]
+    .filter((p) => p.purchases > 0)
+    .sort((a, b) => b.purchases - a.purchases)
+    .slice(0, 8)
+    .map((p) => p.name);
+  return ok(top.length >= 3 ? top : STARTER_USUALS);
+}
+
+/** Quick add: insert a whole spoken or typed shopping list in one statement (all or nothing). */
+export async function createProducts(input: ProductInput[]): Promise<ActionResult<{ added: number }>> {
+  const parsed = productBatchSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Check the items and try again." };
+  const ctx = await actionContext();
+  if (!ctx) return notSignedIn;
+
+  const { error } = await ctx.supabase
+    .from("products")
+    .insert(parsed.data.map((p) => ({ ...p, item_key: itemIdentity(p.name), household_id: ctx.viewer.householdId })));
+  if (error) return dbError(error);
+  refreshApp();
+  return ok({ added: parsed.data.length }, `${parsed.data.length} ${parsed.data.length === 1 ? "product" : "products"} added`);
 }
 
 export async function updateProduct(id: string, values: ProductInput): Promise<ActionResult> {

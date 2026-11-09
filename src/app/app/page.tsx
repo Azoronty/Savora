@@ -12,6 +12,7 @@ import { formatLongDate } from "@/lib/domain/dates";
 import { getExpiry, type ExpiryStatus } from "@/lib/domain/expiry";
 import { formatMoney, pluralize } from "@/lib/domain/format";
 import { buildInsights, type Insight } from "@/lib/domain/insights";
+import { planWeek } from "@/lib/domain/plan";
 import { recommendRecipes } from "@/lib/domain/recommend";
 import { computeWasteStats } from "@/lib/domain/waste";
 import { getSaviState, listProducts, listShoppingItems, listWasteRecords } from "@/lib/data/queries";
@@ -63,6 +64,7 @@ export default async function DashboardPage() {
   const wasteStats = computeWasteStats(waste, today);
   const suggestions = recommendRecipes(products, today, { limit: 3 });
   const insights = buildInsights({ products, shopping: openShopping, waste, today });
+  const plan = planWeek(products, today);
 
   const headline =
     soon + expired === 0
@@ -88,6 +90,26 @@ export default async function DashboardPage() {
           icon={<Recycle className="size-4" />}
         />
       </section>
+
+      {plan.atRisk.length > 0 && (
+        <Link
+          href="/app/plan"
+          className="group mb-12 flex flex-col gap-4 rounded-xl bg-forest p-5 text-card shadow-soft transition-colors hover:bg-forest-deep sm:flex-row sm:items-center sm:justify-between sm:p-6"
+        >
+          <div className="min-w-0">
+            <p className="font-mono text-[0.7rem] uppercase tracking-[0.14em] text-card/60">Rescue plan · next 7 days</p>
+            <p className="mt-1.5 font-display text-[1.45rem] leading-snug">
+              {plan.atRisk.length} {plan.atRisk.length === 1 ? "item reaches its date" : "items reach their date"} this week. The plan uses {plan.saved.length} of them in time.
+            </p>
+            {plan.days[0].meals.length > 0 && (
+              <p className="mt-1 text-sm text-card/75">Today: {plan.days[0].meals.map((m) => m.recipe.title).join(" + ")}</p>
+            )}
+          </div>
+          <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium">
+            Open the plan <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+          </span>
+        </Link>
+      )}
 
       <section className="mb-12" aria-labelledby="week-heading">
         <SectionHeading id="week-heading" eyebrow="Expiry timeline" title="The week ahead" href="/app/expiring" cta="Use-soon list" />

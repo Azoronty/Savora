@@ -208,8 +208,34 @@ export const SLIDES: ReactNode[] = [
     </div>
   </Frame>,
 
+  /* 6b · Отличие: план спасения, напоминания, ввод одной фразой */
+  <Frame key="unique" n={7}>
+    <Eyebrow>Чем Savora отличается</Eyebrow>
+    <div className="mt-10 grid grid-cols-[1fr_760px] gap-[80px]">
+      <div>
+        <Title className="!text-[60px]">Не напоминает о сроках, а&nbsp;составляет план, как всё успеть съесть.</Title>
+        <div className="mt-10 flex flex-col gap-7">
+          {[
+            ["01", "План спасения на неделю", "Расписание блюд по дедлайнам: продукт, у которого меньше всего времени, планируется первым. На демо-кухне план использует вовремя 7 из 7 продуктов, которые иначе дойдут до срока."],
+            ["02", "Утреннее push-уведомление", "Каждый час база сама будит сервер (pg_cron), и в выбранный час человек получает: что истекает к завтра и что приготовить сегодня. Даже если сайт закрыт. Каждая отправка записывается."],
+            ["03", "Ввод одной фразой", "Голосом или текстом: «молоко 2 л, яйца 10, шпинат». Savora сама разбивает на продукты, ставит количество и срок. Плюс «обычные покупки» в одно касание."],
+          ].map(([n, t, d]) => (
+            <div data-a key={n} className="grid grid-cols-[56px_1fr] gap-4">
+              <span className="font-mono text-[20px] text-saffron">{n}</span>
+              <div>
+                <h3 className="font-display text-[34px] font-normal leading-tight">{t}</h3>
+                <p className="mt-2 text-[21px] leading-[1.45] text-ink-2">{d}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <Shot src="/pitch/plan.jpg" alt="Страница плана спасения: 7 продуктов, 7 используются вовремя" className="w-full self-center" />
+    </div>
+  </Frame>,
+
   /* 6 · Демо: главный экран */
-  <Frame key="demo-dashboard" n={7}>
+  <Frame key="demo-dashboard" n={8}>
     <div className="grid h-full grid-cols-[480px_1fr] gap-[72px]">
       <div className="pt-2">
         <Eyebrow>Продукт</Eyebrow>
@@ -224,7 +250,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 7 · Демо: сценарии */
-  <Frame key="demo-flows" n={8}>
+  <Frame key="demo-flows" n={9}>
     <Eyebrow>Продукт</Eyebrow>
     <Title className="mt-8 text-[60px]">Добавить за секунды. Приготовить то, что истекает.</Title>
     <div className="mt-12 grid grid-cols-[1fr_1fr_250px] items-start gap-10">
@@ -245,7 +271,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 8 · Как работают рекомендации */
-  <Frame key="engine" n={9}>
+  <Frame key="engine" n={10}>
     <Eyebrow>Рекомендации</Eyebrow>
     <Title className="mt-8 max-w-[1500px] text-[68px]">Рекомендации строятся по правилам, которые можно прочитать.</Title>
     <div className="mt-14 grid grid-cols-[1.15fr_1fr] gap-12">
@@ -288,7 +314,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* · Savi, 1 of 2: who Savi is */
-  <Frame key="savi" n={10}>
+  <Frame key="savi" n={11}>
     <div className="grid h-full grid-cols-[1fr_760px] items-center gap-[80px]">
       <div>
         <Eyebrow>Savi · часть SAVORA</Eyebrow>
@@ -318,7 +344,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* · Savi, 2 of 2: how Savi grows */
-  <Frame key="savi-growth" n={11}>
+  <Frame key="savi-growth" n={12}>
     <Eyebrow>Savi растёт</Eyebrow>
     <Title className="mt-8 text-[64px]">Чем больше еды вы спасаете, тем сильнее Savi.</Title>
     <div data-a className="mt-10 flex items-end justify-between rounded-[32px] bg-[radial-gradient(ellipse_at_50%_100%,#f3e3c3,transparent_70%)] px-10 pb-6 pt-8">
@@ -349,7 +375,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 9 · Архитектура */
-  <Frame key="architecture" n={12}>
+  <Frame key="architecture" n={13}>
     <Eyebrow>Архитектура</Eyebrow>
     <Title className="mt-8 text-[68px]">Настоящий бэкенд. Защита — на уровне базы данных.</Title>
     <div className="relative mt-16 grid grid-cols-[1fr_1.5fr_1fr] items-stretch gap-[72px]">
@@ -400,7 +426,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 10 · Ценность */
-  <Frame key="value" n={13}>
+  <Frame key="value" n={14}>
     <Eyebrow>Ценность</Eyebrow>
     <Title className="mt-8 max-w-[1500px]">На каждую причину потерь — своя функция.</Title>
     <div className="mt-14 border-t-2 border-ink">
@@ -420,7 +446,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 11 · Честность */
-  <Frame key="honesty" n={14}>
+  <Frame key="honesty" n={15}>
     <Eyebrow>Принципы</Eyebrow>
     <div className="mt-12 grid grid-cols-[1fr_1fr] gap-[100px]">
       <Title>Savora следит за датами. Последнее слово — за вами.</Title>
@@ -441,7 +467,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 12 · Итог */
-  <Frame key="closing" n={15} dark>
+  <Frame key="closing" n={16} dark>
     <div className="flex h-full flex-col justify-center">
       {/* eslint-disable-next-line @next/next/no-img-element -- brand wordmark */}
       <img data-a src="/brand/wordmark-light.webp" alt="SAVORA" className="h-[72px] w-auto self-start" />

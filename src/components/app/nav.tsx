@@ -1,6 +1,6 @@
 "use client";
 
-import { CookingPot, Hourglass, LayoutDashboard, Plus, Refrigerator, ShoppingBasket, Recycle, Sprout, Telescope } from "lucide-react";
+import { CalendarCheck, CookingPot, Hourglass, LayoutDashboard, Plus, Refrigerator, ShoppingBasket, Recycle, Sprout, Telescope } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -11,6 +11,7 @@ const NAV = [
   { href: "/app", label: "Today", icon: LayoutDashboard, mobile: true },
   { href: "/app/inventory", label: "Inventory", icon: Refrigerator, mobile: true },
   { href: "/app/expiring", label: "Use soon", icon: Hourglass, mobile: false },
+  { href: "/app/plan", label: "Rescue plan", icon: CalendarCheck, mobile: false },
   { href: "/app/meals", label: "Meals", icon: CookingPot, mobile: true },
   { href: "/app/shopping", label: "Shopping", icon: ShoppingBasket, mobile: true },
   { href: "/app/waste", label: "Waste log", icon: Recycle, mobile: true },

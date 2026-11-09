@@ -149,17 +149,132 @@ function singular(word: string): string {
 export function tokenize(text: string): string[] {
   return text
     .toLowerCase()
+    .replace(/ё/g, "е")
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z\s]/g, " ")
+    .replace(/[\u0300-\u036f]/g, "") // strip Latin accents ("crème")
+    .normalize("NFC") // re-join Cyrillic letters such as "й" that NFD splits
+    .replace(/[^a-zа-я\s]/g, " ")
     .split(/\s+/)
     .filter(Boolean)
-    .map(singular);
+    .map((w) => (/^[a-z]+$/.test(w) ? singular(w) : w));
 }
+
+/**
+ * Russian names as word stems ("молок" matches молоко, молока). Multi-word
+ * stems beat single words, so "томатная паста" is tomato paste, not pasta.
+ */
+const RU: Record<string, string[]> = {
+  tomato: ["помидор", "томат", "черри"],
+  spinach: ["шпинат"],
+  lettuce: ["салат", "руккол", "айсберг"],
+  cucumber: ["огур"],
+  "bell pepper": ["перец", "болгарск перец", "сладк перец"],
+  onion: ["лук", "луковиц"],
+  "spring onion": ["зелен лук"],
+  garlic: ["чеснок"],
+  carrot: ["морков"],
+  potato: ["картоф", "картошк"],
+  "sweet potato": ["батат", "сладк картоф"],
+  zucchini: ["кабач", "цукин"],
+  broccoli: ["брокк"],
+  mushroom: ["гриб", "шампиньон"],
+  avocado: ["авокадо"],
+  cabbage: ["капуст"],
+  eggplant: ["баклажан"],
+  celery: ["сельдере"],
+  "green beans": ["стручк фасол", "зелен фасол"],
+  parsley: ["петрушк"],
+  basil: ["базилик"],
+  cilantro: ["кинз"],
+  dill: ["укроп"],
+  ginger: ["имбир"],
+  chili: ["чили", "остр перец"],
+  peas: ["горош", "горох"],
+  corn: ["кукуруз"],
+  apple: ["яблок"],
+  banana: ["банан"],
+  lemon: ["лимон"],
+  lime: ["лайм"],
+  orange: ["апельсин", "мандарин"],
+  berries: ["ягод", "клубник", "черник", "малин", "ежевик"],
+  grapes: ["виноград"],
+  pear: ["груш"],
+  mango: ["манго"],
+  milk: ["молок"],
+  yogurt: ["йогурт"],
+  cheese: ["сыр", "пармезан", "чеддер", "гауд"],
+  mozzarella: ["моцарел"],
+  feta: ["фет", "брынз", "халлуми"],
+  "cream cheese": ["сливочн сыр", "творожн сыр", "рикотт", "маскарпоне"],
+  "cottage cheese": ["творог"],
+  cream: ["сливк", "сметан"],
+  butter: ["масло", "масла", "сливочн масл"],
+  egg: ["яйц", "яиц", "яйко"],
+  kefir: ["кефир", "ряженк", "айран"],
+  chicken: ["куриц", "курин", "курят"],
+  "ground beef": ["фарш"],
+  beef: ["говяд", "стейк"],
+  pork: ["свинин", "свин"],
+  bacon: ["бекон"],
+  ham: ["ветчин", "хамон"],
+  sausage: ["колбас", "сосис", "сардел"],
+  turkey: ["индейк", "индюш"],
+  salmon: ["лосос", "семг"],
+  "white fish": ["рыб", "треск", "минта", "хек", "судак"],
+  shrimp: ["кревет"],
+  tuna: ["тунец", "тунц"],
+  rice: ["рис"],
+  pasta: ["макарон", "паст", "спагетт"],
+  noodles: ["лапш"],
+  oats: ["овсян", "геркулес"],
+  flour: ["мук"],
+  quinoa: ["киноа"],
+  couscous: ["кускус", "булгур"],
+  buckwheat: ["гречк", "гречн"],
+  lentils: ["чечевиц"],
+  chickpeas: ["нут"],
+  beans: ["фасол"],
+  bread: ["хлеб", "батон", "багет"],
+  tortilla: ["лаваш", "тортиль"],
+  pita: ["пита", "питы"],
+  "orange juice": ["сок"],
+  coffee: ["кофе"],
+  tea: ["чай", "чая"],
+  "canned tomatoes": ["консерв томат", "консерв помидор"],
+  "tomato paste": ["томатн паст"],
+  "coconut milk": ["кокос молок", "кокос сливк"],
+  tofu: ["тофу"],
+  hummus: ["хумус"],
+  pesto: ["песто"],
+  stock: ["бульон"],
+  "soy sauce": ["соев соус"],
+  honey: ["мед"],
+  "peanut butter": ["арахис паст", "арахис масл"],
+};
 
 const ALIAS_INDEX = CATALOG.flatMap((entry) =>
   entry.aliases.map((alias) => ({ tokens: tokenize(alias), entry })),
 );
+const RU_INDEX = Object.entries(RU).flatMap(([key, stems]) =>
+  stems.map((stem) => ({ stems: stem.split(" "), entry: BY_KEY.get(key)! })),
+);
+
+/** Best Russian stem match: most words, then longest stems, then the later word. */
+function matchRussian(tokens: string[]): CatalogEntry | undefined {
+  let best: { entry: CatalogEntry; words: number; length: number; end: number } | undefined;
+  for (const { stems, entry } of RU_INDEX) {
+    const length = stems.join("").length;
+    for (let i = tokens.length - stems.length; i >= 0; i--) {
+      if (!stems.every((stem, j) => tokens[i + j].startsWith(stem))) continue;
+      const end = i + stems.length;
+      if (!best || stems.length > best.words || (stems.length === best.words && (length > best.length || (length === best.length && end > best.end)))) {
+        best = { entry, words: stems.length, length, end };
+      }
+      break;
+    }
+  }
+  return best?.entry;
+}
 
 /** Index just past the last occurrence of `needle` in `haystack`, or -1. */
 function lastMatchEnd(haystack: string[], needle: string[]): number {
@@ -188,7 +303,7 @@ export function matchCatalog(name: string): CatalogEntry | undefined {
       best = { entry, length: alias.length, end };
     }
   }
-  return best?.entry;
+  return best?.entry ?? matchRussian(tokens);
 }
 
 /** Autocomplete suggestions for the quick-add field. */

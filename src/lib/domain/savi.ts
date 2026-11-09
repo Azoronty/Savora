@@ -129,11 +129,13 @@ const TIPS = [
 /**
  * First-visit tour. Steps with href: Savi walks to that nav link, the page opens and
  * `spot` (a CSS selector on that page) is highlighted. Steps without href happen on Today.
+ * `anywhere`: show the step even when the layout has no nav link for it (Savi stays home).
  */
-export const SAVI_TOUR: { href?: string; spot?: string; text: string }[] = [
+export const SAVI_TOUR: { href?: string; spot?: string; text: string; anywhere?: boolean }[] = [
   { text: "Hi, I'm Savi! Want a quick tour of your kitchen?" },
   { href: "/app/inventory", spot: "main ul:has(> [data-savi-product])", text: "This is your inventory: fridge, freezer and pantry in one list. Type a name and I fill in the rest." },
   { href: "/app/expiring", spot: "main ul:has(> [data-savi-product])", text: "Use soon shows food to eat in the next 3 days, with recipes that use it. Check here first." },
+  { href: "/app/plan", spot: "main section[aria-label='Plan impact']", anywhere: true, text: "The rescue plan schedules your meals so everything is cooked before its date. Turn on the morning reminder here." },
   { href: "/app/meals", spot: "main a[href^='/app/meals/']", text: "Meals are ranked by what expires first. \"I cooked this\" updates your stock." },
   { href: "/app/shopping", spot: "main form:has(#shopping-name)", text: "Add to the shopping list here. It blocks duplicates and warns when something is already at home." },
   { href: "/app/waste", spot: "main section[aria-label='Summary']", text: "If food gets thrown away, log it. These numbers show what you lose and why." },

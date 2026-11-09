@@ -504,17 +504,17 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
     };
     const last = SAVI_TOUR.length - 1;
     // Count only the sections this layout shows, so the "n of total" counter has no gaps.
-    const total = SAVI_TOUR.filter((s) => s.href && visible(s.href)).length;
+    const total = SAVI_TOUR.filter((s) => s.href && (s.anywhere || visible(s.href))).length;
     let n = 0;
     for (let i = 0; i < SAVI_TOUR.length; i++) {
       const step = SAVI_TOUR[i];
       const link = step.href ? visible(step.href) : undefined;
-      if (step.href && !link) continue; // e.g. "Use soon" is not in the phone navigation
-      if (link) {
+      if (step.href && !link && !step.anywhere) continue; // e.g. "Use soon" is not in the phone navigation
+      if (step.href) {
         n++;
         await goTo(link);
-        link.style.backgroundColor = "var(--color-saffron-soft)";
-        await open(step.href!, step.spot);
+        if (link) link.style.backgroundColor = "var(--color-saffron-soft)";
+        await open(step.href, step.spot);
       } else if (i === last) {
         await open("/app");
         await goTo();
