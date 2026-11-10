@@ -55,6 +55,12 @@ const PRODUCTS: DemoProduct[] = [
   { name: "Green beans", quantity: 250, unit: "g", category: "vegetables", storage: "fridge", boughtDaysAgo: 1, expiresIn: 6, priceCents: 229 },
   { name: "Sweet potatoes", quantity: 2, unit: "pcs", category: "vegetables", storage: "pantry", boughtDaysAgo: 2, expiresIn: 6, priceCents: 240 },
   { name: "Tortilla wraps", quantity: 1, unit: "pack", category: "bakery", storage: "pantry", boughtDaysAgo: 3, expiresIn: 6, priceCents: 189 },
+  { name: "Semi-skimmed milk", quantity: 1, unit: "l", category: "dairy", storage: "fridge", boughtDaysAgo: 1, expiresIn: 5, priceCents: 129 },
+  { name: "Basil", quantity: 1, unit: "pack", category: "vegetables", storage: "fridge", boughtDaysAgo: 1, expiresIn: 5, priceCents: 99 },
+  { name: "Vine tomatoes", quantity: 5, unit: "pcs", category: "vegetables", storage: "pantry", boughtDaysAgo: 1, expiresIn: 6, priceCents: 249 },
+  { name: "Cucumbers", quantity: 2, unit: "pcs", category: "vegetables", storage: "fridge", boughtDaysAgo: 1, expiresIn: 6, priceCents: 140 },
+  { name: "Fresh salmon", quantity: 300, unit: "g", category: "fish", storage: "fridge", boughtDaysAgo: 0, expiresIn: 6, priceCents: 799 },
+  { name: "Baby potatoes", quantity: 500, unit: "g", category: "vegetables", storage: "pantry", boughtDaysAgo: 1, expiresIn: 6, priceCents: 179 },
   { name: "Potatoes", quantity: 1, unit: "kg", category: "vegetables", storage: "pantry", boughtDaysAgo: 4, expiresIn: 25, priceCents: 199 },
   { name: "Cheddar", quantity: 200, unit: "g", category: "dairy", storage: "fridge", boughtDaysAgo: 6, expiresIn: 20, priceCents: 349 },
 ];

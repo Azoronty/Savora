@@ -141,7 +141,7 @@ export function WasteLogList({ records }: { records: WasteRecord[] }) {
     <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-card">
       {records.map((r) => (
         <li key={r.id} className="flex items-center gap-4 px-4 py-3.5 sm:px-5">
-          <CategoryIcon category={r.category} />
+          <CategoryIcon category={r.category} name={r.product_name} />
           <div className="min-w-0 flex-1">
             <p className="flex items-center gap-2">
               <span className="truncate font-medium">{r.product_name}</span>

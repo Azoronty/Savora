@@ -25,7 +25,7 @@ export function ProductRow({ product, today, risk }: { product: Product; today: 
   const StorageIcon = STORAGE_ICON[product.storage];
   return (
     <li data-savi-product={product.name} className="group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-4 py-3.5 transition-colors hover:bg-white/60 sm:grid-cols-[auto_minmax(0,1fr)_8.5rem_7rem_auto] sm:px-5">
-      <CategoryIcon category={product.category} />
+      <CategoryIcon category={product.category} name={product.name} />
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <p className="truncate font-medium">{product.name}</p>
