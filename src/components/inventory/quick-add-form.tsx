@@ -74,7 +74,17 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
       setHeard(interim);
       if (said.trim()) setText((t) => (t.trim() ? `${t.trim()}, ${said.trim()}` : said.trim()));
     };
-    r.onerror = (e) => setVoiceError(e.error === "not-allowed" ? "Microphone access is blocked for this site." : "Didn't catch that. Try again or type the list.");
+    r.onerror = (e) =>
+      setVoiceError(
+        {
+          "not-allowed": "Microphone access is blocked. Allow it in the site settings (icon left of the address), then reload.",
+          "service-not-allowed": "Microphone access is blocked. Allow it in the site settings (icon left of the address), then reload.",
+          "audio-capture": "No microphone found on this device.",
+          network: "The browser's speech service can't be reached (network, VPN or firewall). Type the list instead.",
+          "no-speech": "Didn't hear anything. Tap the mic and speak.",
+          "language-not-supported": "This browser can't recognise this language. Switch EN / RU.",
+        }[e.error] ?? "Didn't catch that. Try again or type the list.",
+      );
     r.onend = () => {
       setSpeech("idle");
       setHeard("");
@@ -150,6 +160,9 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
             </span>
           )}
         </div>
+        {speech === "unsupported" && (
+          <p className="mt-1 text-xs text-muted">Voice input needs Chrome, Edge or Safari. In this browser, type the list.</p>
+        )}
         {heard && <p className="mt-1 text-sm italic text-muted" aria-live="polite">{heard}…</p>}
         {voiceError && <p className="mt-1 text-xs text-expired">{voiceError}</p>}
       </div>
