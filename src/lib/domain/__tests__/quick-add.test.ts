@@ -51,8 +51,35 @@ describe("quick add parser", () => {
     ]);
   });
 
+  it("splits speech that arrives without commas", () => {
+    expect(short("молоко 2 литра яйца 10 штук шпинат хлеб")).toEqual([
+      ["milk", 2, "l"],
+      ["egg", 10, "pcs"],
+      ["spinach", 200, "g"],
+      ["bread", 1, "pcs"],
+    ]);
+    expect(short("2 литра молока 10 яиц полкило фарша")).toEqual([
+      ["milk", 2, "l"],
+      ["egg", 10, "pcs"],
+      ["ground beef", 0.5, "kg"],
+    ]);
+  });
+
+  it("keeps two-word products together", () => {
+    expect(short("томатная паста яблочный сок куриное филе 500 грамм").map((r) => r[0])).toEqual(["tomato paste", "orange juice", "chicken"]);
+    expect(short("молоко сливочное масло").map((r) => r[0])).toEqual(["milk", "butter"]);
+  });
+
+  it("reads number words, compounds and полтора", () => {
+    expect(short("двадцать пять яиц, полтора литра молока, twenty five eggs")).toEqual([
+      ["egg", 25, "pcs"],
+      ["milk", 1.5, "l"],
+      ["egg", 25, "pcs"],
+    ]);
+  });
+
   it("names recognised Russian items by their catalog name", () => {
-    expect(parseQuickAdd("полкило фарша, молоко", today).map((i) => i.name)).toEqual(["Ground beef", "Milk"]);
+    expect(parseQuickAdd("полкило фарша, молоко", today).map((i) => i.name)).toEqual(["Фарш", "Молоко"]);
   });
 
   it("treats a bare number for weighed food as packs", () => {

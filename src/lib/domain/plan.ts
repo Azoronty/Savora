@@ -66,6 +66,8 @@ export function slackWeight(slack: number): number {
 }
 
 const FREEZABLE: Category[] = ["meat", "fish", "bakery"];
+/** A meal is planned only when one of its items has at most this many days of slack left. */
+const SLACK_WINDOW = 2;
 
 function rescueStep(item: PlanItem, daysLeft: number): RescueStep {
   const when = daysLeft === 0 ? "today" : daysLeft === 1 ? "by tomorrow" : `within ${daysLeft} days`;
@@ -118,6 +120,8 @@ export function planWeek(items: PlanItem[], today: IsoDate, { days = 7, maxMissi
           }
         }
         if (rescues.length === 0 || missing.length > maxMissing) continue;
+        // Don't cook food early just because a slot is free: at least one item must be within two days of its date.
+        if (!rescues.some((r) => r.daysLeft - d <= SLACK_WINDOW)) continue;
 
         const score = rescues.reduce((sum, r) => sum + slackWeight(r.daysLeft - d), 0) - missing.length * 3 - recipe.minutes / 100;
         if (!best || score > best.score) best = { recipe, score, rescues, missing };

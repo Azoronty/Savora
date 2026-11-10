@@ -38,7 +38,8 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
   const [dates, setDates] = useState<Record<string, string>>({});
   const [removed, setRemoved] = useState<Set<string>>(new Set());
   const [usuals, setUsuals] = useState<string[]>([]);
-  const [lang, setLang] = useState<"en-US" | "ru-RU">("en-US");
+  const [lang, setLang] = useState<"en-US" | "ru-RU">("ru-RU");
+  const [heard, setHeard] = useState("");
   const [speech, setSpeech] = useState<"unsupported" | "idle" | "listening">("unsupported");
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const recognition = useRef<Recognition | null>(null);
@@ -46,7 +47,8 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- browser capabilities are only known after mount
     if (speechCtor()) setSpeech("idle");
-    if (navigator.language.toLowerCase().startsWith("ru") || navigator.language.toLowerCase().startsWith("kk")) setLang("ru-RU");
+    // Russian by default (the audience); English only for English-language browsers.
+    if (navigator.language.toLowerCase().startsWith("en")) setLang("en-US");
     getUsualItems().then((r) => r.ok && setUsuals(r.data));
     return () => recognition.current?.stop();
   }, []);
@@ -60,15 +62,23 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
     if (!Ctor) return;
     const r = new Ctor();
     r.lang = lang;
-    r.interimResults = false;
+    r.interimResults = true; // show words as they are heard
     r.continuous = true;
     r.onresult = (e) => {
       let said = "";
-      for (let i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) said += e.results[i][0].transcript;
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) said += e.results[i][0].transcript;
+        else interim += e.results[i][0].transcript;
+      }
+      setHeard(interim);
       if (said.trim()) setText((t) => (t.trim() ? `${t.trim()}, ${said.trim()}` : said.trim()));
     };
     r.onerror = (e) => setVoiceError(e.error === "not-allowed" ? "Microphone access is blocked for this site." : "Didn't catch that. Try again or type the list.");
-    r.onend = () => setSpeech("idle");
+    r.onend = () => {
+      setSpeech("idle");
+      setHeard("");
+    };
     recognition.current = r;
     setVoiceError(null);
     setSpeech("listening");
@@ -129,7 +139,7 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
           )}
         </div>
         <div id="quick-hint" className="mt-1.5 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
-          <span>{speech === "listening" ? "Listening… say items separated by “and”." : "Commas or “and” separate items. Russian works too: «молоко 2 л, яйца 10»."}</span>
+          <span>{speech === "listening" ? "Listening… e.g. «молоко 2 литра, яйца 10 штук, шпинат». Pauses are fine." : "Commas or “and” separate items. Russian works too: «молоко 2 л, яйца 10»."}</span>
           {speech !== "unsupported" && (
             <span className="inline-flex overflow-hidden rounded-full border border-line" role="group" aria-label="Voice language">
               {(["en-US", "ru-RU"] as const).map((l) => (
@@ -140,6 +150,7 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
             </span>
           )}
         </div>
+        {heard && <p className="mt-1 text-sm italic text-muted" aria-live="polite">{heard}…</p>}
         {voiceError && <p className="mt-1 text-xs text-expired">{voiceError}</p>}
       </div>
 

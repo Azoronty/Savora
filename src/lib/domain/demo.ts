@@ -39,6 +39,24 @@ const PRODUCTS: DemoProduct[] = [
   { name: "Spaghetti", quantity: 500, unit: "g", category: "grains", storage: "pantry", boughtDaysAgo: 20, expiresIn: 300, priceCents: 189 },
   { name: "Chopped tomatoes", quantity: 2, unit: "pcs", category: "other", storage: "pantry", boughtDaysAgo: 20, expiresIn: 400, priceCents: 160 },
   { name: "Rolled oats", quantity: 750, unit: "g", category: "grains", storage: "pantry", boughtDaysAgo: 15, expiresIn: 150, priceCents: 229 },
+  // Dates spread over the whole week so the rescue plan has a meal every day,
+  // plus two items no recipe uses (pork chops, pears) to show the rescue steps.
+  { name: "Strawberries", quantity: 250, unit: "g", category: "fruits", storage: "fridge", boughtDaysAgo: 2, expiresIn: 2, priceCents: 349 },
+  { name: "Mushrooms", quantity: 250, unit: "g", category: "vegetables", storage: "fridge", boughtDaysAgo: 2, expiresIn: 3, priceCents: 199 },
+  { name: "Pork chops", quantity: 400, unit: "g", category: "meat", storage: "fridge", boughtDaysAgo: 1, expiresIn: 3, priceCents: 599 },
+  { name: "Single cream", quantity: 200, unit: "ml", category: "dairy", storage: "fridge", boughtDaysAgo: 3, expiresIn: 4, priceCents: 129 },
+  { name: "Wholegrain bread", quantity: 1, unit: "pcs", category: "bakery", storage: "pantry", boughtDaysAgo: 1, expiresIn: 4, priceCents: 299 },
+  { name: "Zucchini", quantity: 2, unit: "pcs", category: "vegetables", storage: "fridge", boughtDaysAgo: 2, expiresIn: 4, priceCents: 180 },
+  { name: "Pears", quantity: 3, unit: "pcs", category: "fruits", storage: "pantry", boughtDaysAgo: 3, expiresIn: 4, priceCents: 210 },
+  { name: "Ground beef", quantity: 500, unit: "g", category: "meat", storage: "fridge", boughtDaysAgo: 0, expiresIn: 5, priceCents: 699 },
+  { name: "Broccoli", quantity: 1, unit: "pcs", category: "vegetables", storage: "fridge", boughtDaysAgo: 1, expiresIn: 5, priceCents: 149 },
+  { name: "Kefir", quantity: 1, unit: "l", category: "dairy", storage: "fridge", boughtDaysAgo: 2, expiresIn: 5, priceCents: 189 },
+  { name: "Mozzarella", quantity: 125, unit: "g", category: "dairy", storage: "fridge", boughtDaysAgo: 1, expiresIn: 6, priceCents: 159 },
+  { name: "Green beans", quantity: 250, unit: "g", category: "vegetables", storage: "fridge", boughtDaysAgo: 1, expiresIn: 6, priceCents: 229 },
+  { name: "Sweet potatoes", quantity: 2, unit: "pcs", category: "vegetables", storage: "pantry", boughtDaysAgo: 2, expiresIn: 6, priceCents: 240 },
+  { name: "Tortilla wraps", quantity: 1, unit: "pack", category: "bakery", storage: "pantry", boughtDaysAgo: 3, expiresIn: 6, priceCents: 189 },
+  { name: "Potatoes", quantity: 1, unit: "kg", category: "vegetables", storage: "pantry", boughtDaysAgo: 4, expiresIn: 25, priceCents: 199 },
+  { name: "Cheddar", quantity: 200, unit: "g", category: "dairy", storage: "fridge", boughtDaysAgo: 6, expiresIn: 20, priceCents: 349 },
 ];
 
 const SHOPPING: { name: string; quantity: number; unit: Unit; category: Category; note?: string }[] = [
