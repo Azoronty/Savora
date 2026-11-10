@@ -238,7 +238,7 @@ export default async function LandingPage() {
               </p>
             </div>
             <ol data-reveal className="-mb-2 flex items-end gap-3 overflow-x-auto px-6 pb-8 pt-10 sm:justify-between sm:px-10 lg:px-14">
-              {["Seed", "Sprout", "Bud", "Harvest", "Guardian", "Chef", "Food Guardian"].map((name, i) => (
+              {["Seed", "Sprout", "Bud", "Harvest", "Chef", "Food Mage", "Food Guardian"].map((name, i) => (
                 <li key={name} className="flex shrink-0 flex-col items-center gap-3">
                   {/* eslint-disable-next-line @next/next/no-img-element -- small sprites */}
                   <img src={`/savi/stage-${i + 1}.webp`} alt={`Savi stage ${i + 1}: ${name}`} className="w-auto drop-shadow-[0_12px_16px_rgba(20,42,30,0.18)]" style={{ height: 64 + i * 18 }} loading="lazy" />

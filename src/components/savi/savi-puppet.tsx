@@ -7,7 +7,7 @@ export type PuppetDrive = { crouch: number; reach: number; lean: number; airborn
 export type PuppetHandle = { drive: PuppetDrive; wake: () => void };
 
 /** Width / height of each stage illustration in public/savi/stage-N.webp. */
-const ASPECT = [128 / 156, 157 / 204, 177 / 248, 202 / 278, 222 / 330, 270 / 370, 276 / 367];
+const ASPECT = [323 / 400, 271 / 400, 278 / 400, 276 / 400, 311 / 400, 530 / 400, 471 / 400];
 
 /**
  * Savi drawn as the whole stage illustration (the same picture as on the Savi

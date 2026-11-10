@@ -12,9 +12,9 @@ export const SAVI_STAGES: SaviStage[] = [
   { n: 2, name: "Sprout", minXp: 60, blurb: "First leaves, first habits." },
   { n: 3, name: "Bud", minXp: 160, blurb: "Growing stronger every day." },
   { n: 4, name: "Harvest", minXp: 320, blurb: "A true kitchen helper." },
-  { n: 5, name: "Guardian", minXp: 560, blurb: "Protecting your food." },
-  { n: 6, name: "Chef", minXp: 900, blurb: "Cooking up better choices." },
-  { n: 7, name: "Food Guardian", minXp: 1400, blurb: "A champion against food waste." },
+  { n: 5, name: "Chef", minXp: 560, blurb: "Cooking up better choices." },
+  { n: 6, name: "Food Mage", minXp: 900, blurb: "Keeps food in the air and out of the bin." },
+  { n: 7, name: "Food Guardian", minXp: 1400, blurb: "A sacred champion against food waste." },
 ];
 
 export type SaviProgress = {

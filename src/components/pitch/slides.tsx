@@ -348,7 +348,7 @@ export const SLIDES: ReactNode[] = [
     <Eyebrow>Savi растёт</Eyebrow>
     <Title className="mt-8 text-[64px]">Чем больше еды вы спасаете, тем сильнее Savi.</Title>
     <div data-a className="mt-10 flex items-end justify-between rounded-[32px] bg-[radial-gradient(ellipse_at_50%_100%,#f3e3c3,transparent_70%)] px-10 pb-6 pt-8">
-      {["Seedling", "Sprout", "Bud", "Freshling", "Harvest Guardian", "Culinary Hero", "Food Guardian"].map((name, i) => (
+      {["Seed", "Sprout", "Bud", "Harvest", "Chef", "Food Mage", "Food Guardian"].map((name, i) => (
         <div key={name} className="flex flex-col items-center gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element -- slide canvas */}
           <img src={`/pitch/savi-${i + 1}.webp`} alt={`Savi, стадия ${i + 1}: ${name}`} style={{ height: 140 + i * 28 }} className="w-auto drop-shadow-[0_18px_22px_rgba(20,42,30,0.22)]" />
