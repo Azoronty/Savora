@@ -26,6 +26,8 @@ type RecognitionCtor = new () => Recognition;
 
 function speechCtor(): RecognitionCtor | null {
   const w = window as unknown as { SpeechRecognition?: RecognitionCtor; webkitSpeechRecognition?: RecognitionCtor };
+  // Yandex, Opera and Brave expose the API from Chromium but have no speech service behind it: it stops at once.
+  if (/YaBrowser|OPR\//.test(navigator.userAgent) || "brave" in navigator) return null;
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
@@ -85,9 +87,20 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
           "language-not-supported": "This browser can't recognise this language. Switch EN / RU.",
         }[e.error] ?? "Didn't catch that. Try again or type the list.",
       );
+    const startedAt = Date.now();
+    let gotResult = false;
+    const onResult = r.onresult;
+    r.onresult = (e) => {
+      gotResult = true;
+      onResult?.(e);
+    };
     r.onend = () => {
       setSpeech("idle");
       setHeard("");
+      // Ending within a second with nothing heard means the browser has no working speech service.
+      if (!gotResult && Date.now() - startedAt < 1000) {
+        setVoiceError((err) => err ?? "Voice input stopped at once: this browser has no speech service. Open Savora in Chrome or Edge, or type the list.");
+      }
     };
     recognition.current = r;
     setVoiceError(null);
@@ -161,7 +174,7 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
           )}
         </div>
         {speech === "unsupported" && (
-          <p className="mt-1 text-xs text-muted">Voice input needs Chrome, Edge or Safari. In this browser, type the list.</p>
+          <p className="mt-1 text-xs text-muted">Voice input works in Chrome, Edge and Safari (not in Yandex Browser, Opera or Brave). Here, type the list.</p>
         )}
         {heard && <p className="mt-1 text-sm italic text-muted" aria-live="polite">{heard}…</p>}
         {voiceError && <p className="mt-1 text-xs text-expired">{voiceError}</p>}
