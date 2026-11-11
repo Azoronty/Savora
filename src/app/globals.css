@@ -182,6 +182,18 @@
   50% { translate: 0 -8px; }
 }
 
+/* Recharts makes the chart focusable; a tap drew the browser's black focus box. Keyboard users keep a ring. */
+.recharts-wrapper:focus,
+.recharts-wrapper *:focus {
+  outline: none;
+}
+.recharts-wrapper:focus-visible,
+.recharts-wrapper .recharts-surface:focus-visible {
+  outline: 2px solid var(--color-forest-mid);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
