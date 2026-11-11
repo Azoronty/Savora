@@ -498,6 +498,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      savi_demo_level_up: { Args: never; Returns: number }
       reminder_batch: { Args: { p_secret: string }; Returns: Json }
       reminder_prune: { Args: { p_endpoint: string; p_secret: string }; Returns: undefined }
       reminder_record: {
@@ -564,6 +565,7 @@ export type Database = {
         | "recipe_cooked"
         | "shopping_stocked"
         | "mission_completed"
+        | "demo_boost"
       savi_mode: "full" | "quiet" | "hidden"
       storage_location: "fridge" | "freezer" | "pantry"
       waste_reason: "expired" | "spoiled" | "leftovers" | "overbought" | "other"
@@ -714,6 +716,7 @@ export const Constants = {
         "recipe_cooked",
         "shopping_stocked",
         "mission_completed",
+        "demo_boost",
       ],
       savi_mode: ["full", "quiet", "hidden"],
       storage_location: ["fridge", "freezer", "pantry"],

@@ -2,6 +2,7 @@ import { Check, Lock } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/app/page-header";
+import { DemoLevelUp } from "@/components/savi/demo-level-up";
 import { SaviSettings } from "@/components/savi/savi-settings";
 import { cx } from "@/lib/cx";
 import { isValidTimeZone } from "@/lib/domain/dates";
@@ -25,6 +26,8 @@ function describe(kind: string, label: string | null): string {
       return `Cooked ${label ? (getRecipe(label)?.title.toLowerCase() ?? label) : "a recipe"}`;
     case "shopping_stocked":
       return `Put away shopping (${label ?? "items"})`;
+    case "demo_boost":
+      return "Demo boost (sample XP)";
     case "mission_completed":
       return `Mission complete: ${SAVI_MISSIONS.find((m) => m.key === label)?.title ?? label}`;
     default:
@@ -73,6 +76,7 @@ export default async function SaviPage() {
             <div className="h-2.5 overflow-hidden rounded-full bg-paper-deep" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(p.fraction * 100)} aria-label="Progress to next stage">
               <div className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-chart),var(--color-saffron))]" style={{ width: `${Math.max(3, p.fraction * 100)}%` }} />
             </div>
+            {viewer.isAnonymous && <DemoLevelUp maxed={!p.next} />}
           </div>
         </div>
       </section>

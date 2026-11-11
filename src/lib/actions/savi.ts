@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { isValidTimeZone } from "@/lib/domain/dates";
+import { saviProgress } from "@/lib/domain/savi";
 import { TIMEZONE_COOKIE } from "@/lib/data/session";
 import { actionContext, refreshApp } from "./context";
 import { dbError, notSignedIn, ok, type ActionResult } from "./result";
@@ -33,4 +34,17 @@ export async function saveTimeZone(zone: string): Promise<ActionResult> {
   }
   refreshApp();
   return ok(undefined);
+}
+
+/** Demo accounts only: jump Savi to its next stage so a presentation can show the evolution. */
+export async function demoLevelUp(): Promise<ActionResult<{ xp: number }>> {
+  const ctx = await actionContext();
+  if (!ctx) return notSignedIn;
+  // The database refuses real accounts too; this check just gives a clear message.
+  if (!ctx.viewer.isAnonymous) return { ok: false, error: "Levelling up by button is only available in the demo." };
+  const { data, error } = await ctx.supabase.rpc("savi_demo_level_up");
+  if (error) return dbError(error);
+  refreshApp();
+  const stage = saviProgress(Number(data)).stage;
+  return ok({ xp: Number(data) }, `Savi reached stage ${stage.n}: ${stage.name}`);
 }
