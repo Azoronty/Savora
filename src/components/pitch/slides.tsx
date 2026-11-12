@@ -36,6 +36,120 @@ const Shot = ({ src, alt, className = "" }: { src: string; alt: string; classNam
 );
 
 export const SLIDES: ReactNode[] = [
+  /* 2b · Масштаб: цифры из открытых исследований */
+  <Frame key="research" n={1}>
+    <Eyebrow>Исследование · 1 / 3 · Масштаб</Eyebrow>
+    <div className="mt-12 grid grid-cols-[660px_1fr] gap-[110px]">
+      <Title>В 2022 году в мире выбросили 1,05 млрд тонн еды. Больше всего — дома.</Title>
+      <div className="grid grid-cols-2 gap-x-16 gap-y-14 pt-3">
+        {[
+          ["60%", "пищевых отходов приходится на домохозяйства: 631 млн т. Это больше, чем у ресторанов и магазинов вместе.", "UNEP, 2024"],
+          ["79 кг", "еды в год выбрасывает дома один человек. Между странами с высоким и средним доходом разница всего 7 кг.", "UNEP, 2024"],
+          ["73%", "выброшенного дома ещё можно было съесть: 4,4 из 6 млн т. Это около £1 000 в год на семью из четырёх.", "WRAP, Великобритания, 2022"],
+          ["до 10%", "пищевых отходов ЕС связаны с датами на упаковке: люди путают «употребить до» и «лучше до».", "Еврокомиссия, 2018"],
+        ].map(([n, d, s]) => (
+          <div data-a key={n} className="border-t-2 border-line-strong pt-6">
+            <span className="font-display text-[64px] font-light leading-none text-forest">{n}</span>
+            <p className="mt-4 text-[24px] leading-[1.45] text-ink-2">{d}</p>
+            <p className="mt-3 font-mono text-[15px] uppercase tracking-[0.12em] text-saffron">{s}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+    <p data-a className="absolute bottom-[110px] left-[128px] max-w-[1660px] font-mono text-[15px] leading-[1.6] text-muted">
+      Источники: UNEP, Food Waste Index Report 2024 · WRAP, Household Food and Drink Waste in the UK, 2025 · European Commission, Market study on date marking, 2018
+    </p>
+  </Frame>,
+
+  /* Исследование 2: почему еду выбрасывают */
+  <Frame key="causes" n={2}>
+    <Eyebrow>Исследование · 2 / 3 · Причины</Eyebrow>
+    <div className="mt-10 grid grid-cols-[640px_1fr] gap-[100px]">
+      <div>
+        <Title>Еду выбрасывают не потому, что она плохая, а потому что её не успели съесть.</Title>
+        <p data-a className="mt-10 text-[24px] leading-[1.5] text-ink-2">Каждая причина из исследований — это отдельная функция Savora.</p>
+      </div>
+      <div className="flex flex-col gap-5 pt-2">
+        {[
+          ["≈ 40%", "домашних отходов в Великобритании — «не успели использовать»: испортилось или прошёл срок.", "WRAP, 2021/22", "План спасения ставит блюда по дедлайнам"],
+          ["до 10%", "пищевых отходов ЕС связаны с датами на упаковке и путаницей «употребить до» / «лучше до».", "Еврокомиссия, 2018", "Понятные статусы и утреннее напоминание"],
+          ["73%", "выброшенного дома ещё было съедобно — это не испорченная еда, а забытая.", "WRAP, 2022", "Инвентарь и подсказки, что использовать первым"],
+        ].map(([n, d, src, f]) => (
+          <div data-a key={n} className="grid grid-cols-[170px_1fr] gap-6 rounded-[22px] border border-line bg-card p-6">
+            <span className="font-display text-[54px] font-light leading-none text-forest">{n}</span>
+            <div>
+              <p className="text-[22px] leading-[1.4] text-ink-2">{d}</p>
+              <p className="mt-2 font-mono text-[14px] uppercase tracking-[0.12em] text-saffron">{src}</p>
+              <p className="mt-3 inline-flex rounded-full bg-forest-wash px-4 py-1.5 text-[18px] font-medium text-forest-mid">→ {f}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Frame>,
+
+  /* Исследование 3: какие решения уже есть */
+  <Frame key="market" n={3}>
+    <Eyebrow>Исследование · 3 / 3 · Рынок решений</Eyebrow>
+    <Title className="mt-8 text-[60px]">Учёт и напоминания есть у многих. План по дедлайнам — нет.</Title>
+    <div data-a className="mt-10 overflow-hidden rounded-[24px] border border-line bg-card">
+      <table className="w-full text-left text-[20px]">
+        <thead className="bg-paper-deep/70 font-mono text-[15px] uppercase tracking-[0.1em] text-muted">
+          <tr>
+            {["Приложение", "Что делает", "Учёт продуктов дома", "Напоминания о сроках", "Авто-план блюд по дедлайнам", "Ввод одной фразой / голосом"].map((h) => (
+              <th key={h} className="px-5 py-4 font-medium">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {[
+            ["Too Good To Go", "Излишки еды из кафе и магазинов со скидкой", "—", "—", "—", "—"],
+            ["Olio", "Обмен излишками еды с соседями", "—", "—", "—", "—"],
+            ["NoWaste", "Списки продуктов, сканирование, ручной планер", "✓", "✓", "—", "—"],
+            ["Kitche", "Сканирование чеков, рецепты из того, что есть", "✓", "✓", "—", "—"],
+            ["Savora", "План спасения на неделю, push, ввод фразой", "✓", "✓", "✓", "✓"],
+          ].map((row) => (
+            <tr key={row[0]} className={`border-t border-line ${row[0] === "Savora" ? "bg-forest text-card" : ""}`}>
+              {row.map((cell, i) => (
+                <td key={i} className={`px-5 py-4 ${i === 0 ? "font-display text-[24px]" : ""} ${i > 1 ? "text-center text-[24px]" : ""} ${cell === "✓" && row[0] !== "Savora" ? "text-fresh" : ""} ${cell === "—" ? "text-muted" : ""}`}>
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p data-a className="mt-6 max-w-[1600px] text-[18px] leading-[1.5] text-muted">
+      «—» — функция не заявлена в описании приложения. Источники: страницы приложений в App Store и официальные сайты, обзоры (ноябрь 2026). У NoWaste есть планер, но блюда в него ставит сам пользователь.
+    </p>
+  </Frame>,
+
+  /* 2 · Проблема */
+  <Frame key="problem" n={4}>
+    <Eyebrow>Проблема</Eyebrow>
+    <div className="mt-12 grid grid-cols-[660px_1fr] gap-[110px]">
+      <Title>Дома еда чаще всего пропадает из‑за того, что о ней забыли.</Title>
+      <div className="grid grid-cols-2 gap-x-16 gap-y-14 pt-3">
+        {[
+          ["01", "С глаз долой", "Продукты в глубине холодильника вспоминают, когда уже поздно."],
+          ["02", "Сроки ускользают", "Никто не держит в голове все даты, и срок проходит незаметно."],
+          ["03", "Двойные покупки", "Не видя, что есть дома, легко купить вторую пачку того же."],
+          ["04", "Нет плана", "Продукту нужно блюдо. Без идеи он лежит, пока не испортится."],
+        ].map(([n, t, d]) => (
+          <div data-a key={n} className="border-t-2 border-line-strong pt-6">
+            <span className="font-mono text-[18px] text-saffron">{n}</span>
+            <h3 className="mt-3 font-display text-[36px] font-normal">{t}</h3>
+            <p className="mt-3 text-[25px] leading-[1.5] text-ink-2">{d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+    <p data-a className="absolute bottom-[120px] left-[128px] max-w-[1100px] text-[24px] text-muted">
+      В итоге деньги уходят на продукты, которые оказываются в мусорном ведре.
+    </p>
+  </Frame>,
+
   /* 1 · Обложка */
   <div key="cover" className="grid h-full w-full grid-cols-[1fr_1fr] bg-paper">
     <div className="flex flex-col px-[128px] py-[100px]">
@@ -79,120 +193,6 @@ export const SLIDES: ReactNode[] = [
       </div>
     </div>
   </div>,
-
-  /* 2b · Масштаб: цифры из открытых исследований */
-  <Frame key="research" n={2}>
-    <Eyebrow>Исследование · 1 / 3 · Масштаб</Eyebrow>
-    <div className="mt-12 grid grid-cols-[660px_1fr] gap-[110px]">
-      <Title>В 2022 году в мире выбросили 1,05 млрд тонн еды. Больше всего — дома.</Title>
-      <div className="grid grid-cols-2 gap-x-16 gap-y-14 pt-3">
-        {[
-          ["60%", "пищевых отходов приходится на домохозяйства: 631 млн т. Это больше, чем у ресторанов и магазинов вместе.", "UNEP, 2024"],
-          ["79 кг", "еды в год выбрасывает дома один человек. Между странами с высоким и средним доходом разница всего 7 кг.", "UNEP, 2024"],
-          ["73%", "выброшенного дома ещё можно было съесть: 4,4 из 6 млн т. Это около £1 000 в год на семью из четырёх.", "WRAP, Великобритания, 2022"],
-          ["до 10%", "пищевых отходов ЕС связаны с датами на упаковке: люди путают «употребить до» и «лучше до».", "Еврокомиссия, 2018"],
-        ].map(([n, d, s]) => (
-          <div data-a key={n} className="border-t-2 border-line-strong pt-6">
-            <span className="font-display text-[64px] font-light leading-none text-forest">{n}</span>
-            <p className="mt-4 text-[24px] leading-[1.45] text-ink-2">{d}</p>
-            <p className="mt-3 font-mono text-[15px] uppercase tracking-[0.12em] text-saffron">{s}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-    <p data-a className="absolute bottom-[110px] left-[128px] max-w-[1660px] font-mono text-[15px] leading-[1.6] text-muted">
-      Источники: UNEP, Food Waste Index Report 2024 · WRAP, Household Food and Drink Waste in the UK, 2025 · European Commission, Market study on date marking, 2018
-    </p>
-  </Frame>,
-
-  /* Исследование 2: почему еду выбрасывают */
-  <Frame key="causes" n={3}>
-    <Eyebrow>Исследование · 2 / 3 · Причины</Eyebrow>
-    <div className="mt-10 grid grid-cols-[640px_1fr] gap-[100px]">
-      <div>
-        <Title>Еду выбрасывают не потому, что она плохая, а потому что её не успели съесть.</Title>
-        <p data-a className="mt-10 text-[24px] leading-[1.5] text-ink-2">Каждая причина из исследований — это отдельная функция Savora.</p>
-      </div>
-      <div className="flex flex-col gap-5 pt-2">
-        {[
-          ["≈ 40%", "домашних отходов в Великобритании — «не успели использовать»: испортилось или прошёл срок.", "WRAP, 2021/22", "План спасения ставит блюда по дедлайнам"],
-          ["до 10%", "пищевых отходов ЕС связаны с датами на упаковке и путаницей «употребить до» / «лучше до».", "Еврокомиссия, 2018", "Понятные статусы и утреннее напоминание"],
-          ["73%", "выброшенного дома ещё было съедобно — это не испорченная еда, а забытая.", "WRAP, 2022", "Инвентарь и подсказки, что использовать первым"],
-        ].map(([n, d, src, f]) => (
-          <div data-a key={n} className="grid grid-cols-[170px_1fr] gap-6 rounded-[22px] border border-line bg-card p-6">
-            <span className="font-display text-[54px] font-light leading-none text-forest">{n}</span>
-            <div>
-              <p className="text-[22px] leading-[1.4] text-ink-2">{d}</p>
-              <p className="mt-2 font-mono text-[14px] uppercase tracking-[0.12em] text-saffron">{src}</p>
-              <p className="mt-3 inline-flex rounded-full bg-forest-wash px-4 py-1.5 text-[18px] font-medium text-forest-mid">→ {f}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </Frame>,
-
-  /* Исследование 3: какие решения уже есть */
-  <Frame key="market" n={4}>
-    <Eyebrow>Исследование · 3 / 3 · Рынок решений</Eyebrow>
-    <Title className="mt-8 text-[60px]">Учёт и напоминания есть у многих. План по дедлайнам — нет.</Title>
-    <div data-a className="mt-10 overflow-hidden rounded-[24px] border border-line bg-card">
-      <table className="w-full text-left text-[20px]">
-        <thead className="bg-paper-deep/70 font-mono text-[15px] uppercase tracking-[0.1em] text-muted">
-          <tr>
-            {["Приложение", "Что делает", "Учёт продуктов дома", "Напоминания о сроках", "Авто-план блюд по дедлайнам", "Ввод одной фразой / голосом"].map((h) => (
-              <th key={h} className="px-5 py-4 font-medium">{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {[
-            ["Too Good To Go", "Излишки еды из кафе и магазинов со скидкой", "—", "—", "—", "—"],
-            ["Olio", "Обмен излишками еды с соседями", "—", "—", "—", "—"],
-            ["NoWaste", "Списки продуктов, сканирование, ручной планер", "✓", "✓", "—", "—"],
-            ["Kitche", "Сканирование чеков, рецепты из того, что есть", "✓", "✓", "—", "—"],
-            ["Savora", "План спасения на неделю, push, ввод фразой", "✓", "✓", "✓", "✓"],
-          ].map((row) => (
-            <tr key={row[0]} className={`border-t border-line ${row[0] === "Savora" ? "bg-forest text-card" : ""}`}>
-              {row.map((cell, i) => (
-                <td key={i} className={`px-5 py-4 ${i === 0 ? "font-display text-[24px]" : ""} ${i > 1 ? "text-center text-[24px]" : ""} ${cell === "✓" && row[0] !== "Savora" ? "text-fresh" : ""} ${cell === "—" ? "text-muted" : ""}`}>
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-    <p data-a className="mt-6 max-w-[1600px] text-[18px] leading-[1.5] text-muted">
-      «—» — функция не заявлена в описании приложения. Источники: страницы приложений в App Store и официальные сайты, обзоры (ноябрь 2026). У NoWaste есть планер, но блюда в него ставит сам пользователь.
-    </p>
-  </Frame>,
-
-  /* 2 · Проблема */
-  <Frame key="problem" n={5}>
-    <Eyebrow>Проблема</Eyebrow>
-    <div className="mt-12 grid grid-cols-[660px_1fr] gap-[110px]">
-      <Title>Дома еда чаще всего пропадает из‑за того, что о ней забыли.</Title>
-      <div className="grid grid-cols-2 gap-x-16 gap-y-14 pt-3">
-        {[
-          ["01", "С глаз долой", "Продукты в глубине холодильника вспоминают, когда уже поздно."],
-          ["02", "Сроки ускользают", "Никто не держит в голове все даты, и срок проходит незаметно."],
-          ["03", "Двойные покупки", "Не видя, что есть дома, легко купить вторую пачку того же."],
-          ["04", "Нет плана", "Продукту нужно блюдо. Без идеи он лежит, пока не испортится."],
-        ].map(([n, t, d]) => (
-          <div data-a key={n} className="border-t-2 border-line-strong pt-6">
-            <span className="font-mono text-[18px] text-saffron">{n}</span>
-            <h3 className="mt-3 font-display text-[36px] font-normal">{t}</h3>
-            <p className="mt-3 text-[25px] leading-[1.5] text-ink-2">{d}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-    <p data-a className="absolute bottom-[120px] left-[128px] max-w-[1100px] text-[24px] text-muted">
-      В итоге деньги уходят на продукты, которые оказываются в мусорном ведре.
-    </p>
-  </Frame>,
 
   /* 3 · Аудитория */
   <Frame key="audience" n={6}>
@@ -245,12 +245,12 @@ export const SLIDES: ReactNode[] = [
     <Title className="mt-10">Шесть инструментов на одних данных.</Title>
     <div className="mt-14 grid grid-cols-3 gap-6">
       {[
-        ["План спасения", "Блюда по дедлайнам", "1–3 приёма пищи в день на неделю. Первым готовится то, у чего меньше всего времени. У каждого блюда — причина."],
+        ["План спасения", "Неделя по дедлайнам", "1–3 приёма пищи в день на неделю. Первым готовится то, у чего меньше всего времени. У каждого блюда — причина."],
         ["Уведомления", "Утренний push", "Сервер сам присылает в выбранный час: что истекает к завтра и что приготовить. Даже при закрытом сайте."],
         ["Ввод", "Голосом или строкой", "«Молоко 2 литра, яйца 10 штук, шпинат» — и всё в списке с количеством и сроком. Русский и английский."],
         ["Сроки", "Понятные статусы", "«Свежее», «Использовать скоро» (до 3 дней), «Срок прошёл». Календарь на неделю и своя иконка у каждого продукта."],
         ["Блюда и покупки", "С объяснением, без дублей", "24 рецепта по срочности. Недостающее — в список покупок, который знает, что уже есть дома."],
-        ["Журнал и прогноз", "Честные цифры", "Что и почему выброшено, тренды по неделям. Predictive Kitchen подсказывает, что брать меньше."],
+        ["Журнал и прогноз", "Честные цифры", "Что выброшено, почему и на сколько денег. Тренды по неделям, Predictive Kitchen подсказывает, что брать меньше."],
       ].map(([k, t, d]) => (
         <div data-a key={k} className="flex flex-col rounded-[24px] border border-line bg-card p-8">
           <span className="font-mono text-[17px] text-saffron">{k}</span>
@@ -292,9 +292,9 @@ export const SLIDES: ReactNode[] = [
     <div className="grid h-full grid-cols-[480px_1fr] gap-[72px]">
       <div className="pt-2">
         <Eyebrow>Продукт</Eyebrow>
-        <Title className="mt-8 text-[54px]">Главный экран отвечает на вопрос: что пора использовать?</Title>
+        <Title className="mt-8 text-[54px]">Один экран&nbsp;— и ясно, что спасать сегодня.</Title>
         <p data-a className="mt-8 text-[24px] leading-[1.5] text-ink-2">
-          Сверху — сколько продуктов дойдёт до срока и план на сегодня. Ниже — показатели, календарь на неделю и блюда из того же инвентаря.
+          «27 продуктов дойдут до срока на этой неделе — план использует 25». Сразу под этим: что истекает, что уже просрочено, сколько выброшено за месяц и календарь недели.
         </p>
         <p data-a className="mt-6 text-[19px] text-muted">Скриншот работающего приложения, демо-кухня.</p>
       </div>
@@ -316,9 +316,11 @@ export const SLIDES: ReactNode[] = [
         <p data-a className="mt-5 text-[21px] text-ink-2">Рецепт показывает, что есть, чего нет и почему он здесь.</p>
       </div>
       <div>
-        {/* eslint-disable-next-line @next/next/no-img-element -- slide canvas */}
-        <img data-a src="/pitch/mobile-inventory.jpg" alt="План спасения на телефоне" className="block w-full rounded-[38px] border-[10px] border-forest-deep shadow-lift" />
-        <p data-a className="mt-5 text-[21px] text-ink-2">Телефон: план спасения в нижнем меню.</p>
+        <div data-a className="overflow-hidden rounded-[40px] border-[9px] border-forest-deep bg-forest-deep shadow-lift">
+          {/* eslint-disable-next-line @next/next/no-img-element -- slide canvas */}
+          <img src="/pitch/mobile-inventory.jpg" alt="План спасения на телефоне" className="block w-full rounded-[31px]" />
+        </div>
+        <p data-a className="mt-5 text-[21px] text-ink-2">Адаптивный дизайн: телефон, планшет, компьютер.</p>
       </div>
     </div>
   </Frame>,
@@ -349,19 +351,24 @@ export const SLIDES: ReactNode[] = [
         <p className="mt-6 text-[21px] leading-[1.5] text-ink-2">Продукты с прошедшим сроком не используются. Масло, соль, перец и вода считаются базовыми.</p>
       </div>
       <div data-a className="rounded-[26px] bg-forest p-10 text-card">
-        <p className="font-mono text-[17px] uppercase tracking-[0.14em] text-card/60">Пример объяснения</p>
-        <h3 className="mt-6 font-display text-[40px] font-normal text-card">Омлет со шпинатом и фетой</h3>
-        <ul className="mt-6 flex flex-col gap-4 text-[24px]">
-          <li className="flex gap-3"><span className="mt-3 size-2.5 shrink-0 rounded-full bg-saffron" />Использует шпинат (1 день) и фету (3 дня)</li>
-          <li className="flex gap-3"><span className="mt-3 size-2.5 shrink-0 rounded-full bg-card/80" />Все основные ингредиенты есть</li>
-          <li className="flex gap-3"><span className="mt-3 size-2.5 shrink-0 rounded-full border border-card/50" />Зелёный лук — по желанию</li>
+        <p className="font-mono text-[17px] uppercase tracking-[0.14em] text-card/60">Пример расчёта</p>
+        <h3 className="mt-5 font-display text-[38px] font-normal text-card">Омлет со шпинатом и фетой</h3>
+        <ul className="mt-5 flex flex-col gap-2.5 text-[23px]">
+          {[
+            ["Шпинат · остался 1 день", "+4"],
+            ["Фета · 3 дня", "+3"],
+            ["Яйца · 9 дней", "+1,5"],
+            ["Все основные ингредиенты есть", "+6"],
+            ["Недостающих нет", "0"],
+          ].map(([t, v]) => (
+            <li key={t} className="flex justify-between gap-4 border-b border-card/15 pb-2.5">
+              <span>{t}</span>
+              <span className="font-mono text-saffron">{v}</span>
+            </li>
+          ))}
         </ul>
-        <div className="mt-8 flex gap-2">
-          <span className="h-3 w-12 rounded-full bg-card/85" />
-          <span className="h-3 w-12 rounded-full bg-saffron" />
-          <span className="h-3 w-12 rounded-full bg-saffron" />
-        </div>
-        <p className="mt-4 text-[19px] text-card/65">Полоски: есть · скоро истекает · нет в наличии</p>
+        <p className="mt-4 flex justify-between font-display text-[34px]"><span>Итого</span><span>14,5</span></p>
+        <p className="mt-3 text-[19px] leading-[1.45] text-card/80">Больше баллов — выше в списке. Зелёный лук в рецепте необязательный: его нет, но балл за это не снимается.</p>
       </div>
     </div>
   </Frame>,
