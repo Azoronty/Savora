@@ -80,8 +80,97 @@ export const SLIDES: ReactNode[] = [
     </div>
   </div>,
 
+  /* 2b · Масштаб: цифры из открытых исследований */
+  <Frame key="research" n={2}>
+    <Eyebrow>Исследование · 1 / 3 · Масштаб</Eyebrow>
+    <div className="mt-12 grid grid-cols-[660px_1fr] gap-[110px]">
+      <Title>В 2022 году в мире выбросили 1,05 млрд тонн еды. Больше всего — дома.</Title>
+      <div className="grid grid-cols-2 gap-x-16 gap-y-14 pt-3">
+        {[
+          ["60%", "пищевых отходов приходится на домохозяйства: 631 млн т. Это больше, чем у ресторанов и магазинов вместе.", "UNEP, 2024"],
+          ["79 кг", "еды в год выбрасывает дома один человек. Между странами с высоким и средним доходом разница всего 7 кг.", "UNEP, 2024"],
+          ["73%", "выброшенного дома ещё можно было съесть: 4,4 из 6 млн т. Это около £1 000 в год на семью из четырёх.", "WRAP, Великобритания, 2022"],
+          ["до 10%", "пищевых отходов ЕС связаны с датами на упаковке: люди путают «употребить до» и «лучше до».", "Еврокомиссия, 2018"],
+        ].map(([n, d, s]) => (
+          <div data-a key={n} className="border-t-2 border-line-strong pt-6">
+            <span className="font-display text-[64px] font-light leading-none text-forest">{n}</span>
+            <p className="mt-4 text-[24px] leading-[1.45] text-ink-2">{d}</p>
+            <p className="mt-3 font-mono text-[15px] uppercase tracking-[0.12em] text-saffron">{s}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+    <p data-a className="absolute bottom-[110px] left-[128px] max-w-[1660px] font-mono text-[15px] leading-[1.6] text-muted">
+      Источники: UNEP, Food Waste Index Report 2024 · WRAP, Household Food and Drink Waste in the UK, 2025 · European Commission, Market study on date marking, 2018
+    </p>
+  </Frame>,
+
+  /* Исследование 2: почему еду выбрасывают */
+  <Frame key="causes" n={3}>
+    <Eyebrow>Исследование · 2 / 3 · Причины</Eyebrow>
+    <div className="mt-10 grid grid-cols-[640px_1fr] gap-[100px]">
+      <div>
+        <Title>Еду выбрасывают не потому, что она плохая, а потому что её не успели съесть.</Title>
+        <p data-a className="mt-10 text-[24px] leading-[1.5] text-ink-2">Каждая причина из исследований — это отдельная функция Savora.</p>
+      </div>
+      <div className="flex flex-col gap-5 pt-2">
+        {[
+          ["≈ 40%", "домашних отходов в Великобритании — «не успели использовать»: испортилось или прошёл срок.", "WRAP, 2021/22", "План спасения ставит блюда по дедлайнам"],
+          ["до 10%", "пищевых отходов ЕС связаны с датами на упаковке и путаницей «употребить до» / «лучше до».", "Еврокомиссия, 2018", "Понятные статусы и утреннее напоминание"],
+          ["73%", "выброшенного дома ещё было съедобно — это не испорченная еда, а забытая.", "WRAP, 2022", "Инвентарь и подсказки, что использовать первым"],
+        ].map(([n, d, src, f]) => (
+          <div data-a key={n} className="grid grid-cols-[170px_1fr] gap-6 rounded-[22px] border border-line bg-card p-6">
+            <span className="font-display text-[54px] font-light leading-none text-forest">{n}</span>
+            <div>
+              <p className="text-[22px] leading-[1.4] text-ink-2">{d}</p>
+              <p className="mt-2 font-mono text-[14px] uppercase tracking-[0.12em] text-saffron">{src}</p>
+              <p className="mt-3 inline-flex rounded-full bg-forest-wash px-4 py-1.5 text-[18px] font-medium text-forest-mid">→ {f}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Frame>,
+
+  /* Исследование 3: какие решения уже есть */
+  <Frame key="market" n={4}>
+    <Eyebrow>Исследование · 3 / 3 · Рынок решений</Eyebrow>
+    <Title className="mt-8 text-[60px]">Учёт и напоминания есть у многих. План по дедлайнам — нет.</Title>
+    <div data-a className="mt-10 overflow-hidden rounded-[24px] border border-line bg-card">
+      <table className="w-full text-left text-[20px]">
+        <thead className="bg-paper-deep/70 font-mono text-[15px] uppercase tracking-[0.1em] text-muted">
+          <tr>
+            {["Приложение", "Что делает", "Учёт продуктов дома", "Напоминания о сроках", "Авто-план блюд по дедлайнам", "Ввод одной фразой / голосом"].map((h) => (
+              <th key={h} className="px-5 py-4 font-medium">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {[
+            ["Too Good To Go", "Излишки еды из кафе и магазинов со скидкой", "—", "—", "—", "—"],
+            ["Olio", "Обмен излишками еды с соседями", "—", "—", "—", "—"],
+            ["NoWaste", "Списки продуктов, сканирование, ручной планер", "✓", "✓", "—", "—"],
+            ["Kitche", "Сканирование чеков, рецепты из того, что есть", "✓", "✓", "—", "—"],
+            ["Savora", "План спасения на неделю, push, ввод фразой", "✓", "✓", "✓", "✓"],
+          ].map((row) => (
+            <tr key={row[0]} className={`border-t border-line ${row[0] === "Savora" ? "bg-forest text-card" : ""}`}>
+              {row.map((cell, i) => (
+                <td key={i} className={`px-5 py-4 ${i === 0 ? "font-display text-[24px]" : ""} ${i > 1 ? "text-center text-[24px]" : ""} ${cell === "✓" && row[0] !== "Savora" ? "text-fresh" : ""} ${cell === "—" ? "text-muted" : ""}`}>
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p data-a className="mt-6 max-w-[1600px] text-[18px] leading-[1.5] text-muted">
+      «—» — функция не заявлена в описании приложения. Источники: страницы приложений в App Store и официальные сайты, обзоры (ноябрь 2026). У NoWaste есть планер, но блюда в него ставит сам пользователь.
+    </p>
+  </Frame>,
+
   /* 2 · Проблема */
-  <Frame key="problem" n={2}>
+  <Frame key="problem" n={5}>
     <Eyebrow>Проблема</Eyebrow>
     <div className="mt-12 grid grid-cols-[660px_1fr] gap-[110px]">
       <Title>Дома еда чаще всего пропадает из‑за того, что о ней забыли.</Title>
@@ -105,33 +194,8 @@ export const SLIDES: ReactNode[] = [
     </p>
   </Frame>,
 
-  /* 2b · Масштаб: цифры из открытых исследований */
-  <Frame key="research" n={3}>
-    <Eyebrow>Масштаб проблемы</Eyebrow>
-    <div className="mt-12 grid grid-cols-[660px_1fr] gap-[110px]">
-      <Title>В 2022 году в мире выбросили 1,05 млрд тонн еды. Больше всего — дома.</Title>
-      <div className="grid grid-cols-2 gap-x-16 gap-y-14 pt-3">
-        {[
-          ["60%", "пищевых отходов приходится на домохозяйства: 631 млн т. Это больше, чем у ресторанов и магазинов вместе.", "UNEP, 2024"],
-          ["79 кг", "еды в год выбрасывает дома один человек. Между странами с высоким и средним доходом разница всего 7 кг.", "UNEP, 2024"],
-          ["73%", "выброшенного дома ещё можно было съесть: 4,4 из 6 млн т. Это около £1 000 в год на семью из четырёх.", "WRAP, Великобритания, 2022"],
-          ["до 10%", "пищевых отходов ЕС связаны с датами на упаковке: люди путают «употребить до» и «лучше до».", "Еврокомиссия, 2018"],
-        ].map(([n, d, s]) => (
-          <div data-a key={n} className="border-t-2 border-line-strong pt-6">
-            <span className="font-display text-[64px] font-light leading-none text-forest">{n}</span>
-            <p className="mt-4 text-[24px] leading-[1.45] text-ink-2">{d}</p>
-            <p className="mt-3 font-mono text-[15px] uppercase tracking-[0.12em] text-saffron">{s}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-    <p data-a className="absolute bottom-[110px] left-[128px] max-w-[1660px] font-mono text-[15px] leading-[1.6] text-muted">
-      Источники: UNEP, Food Waste Index Report 2024 · WRAP, Household Food and Drink Waste in the UK, 2025 · European Commission, Market study on date marking, 2018
-    </p>
-  </Frame>,
-
   /* 3 · Аудитория */
-  <Frame key="audience" n={4}>
+  <Frame key="audience" n={6}>
     <Eyebrow>Для кого</Eyebrow>
     <Title className="mt-10 max-w-[1400px]">Для тех, кто покупает продукты на всю семью и готовит дома.</Title>
     <div className="mt-20 grid grid-cols-3 gap-8">
@@ -152,7 +216,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 4 · Решение */
-  <Frame key="solution" n={5} dark>
+  <Frame key="solution" n={7} dark>
     <Eyebrow light>Решение</Eyebrow>
     <Title light className="mt-10 max-w-[1450px]">
       Один список продуктов для всей кухни и три привычки вокруг него.
@@ -176,7 +240,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 5 · Возможности */
-  <Frame key="features" n={6}>
+  <Frame key="features" n={8}>
     <Eyebrow>Возможности</Eyebrow>
     <Title className="mt-10">Шесть инструментов на одних данных.</Title>
     <div className="mt-14 grid grid-cols-3 gap-6">
@@ -198,7 +262,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 6b · Отличие: план спасения, напоминания, ввод одной фразой */
-  <Frame key="unique" n={7}>
+  <Frame key="unique" n={9}>
     <Eyebrow>Чем Savora отличается</Eyebrow>
     <div className="mt-10 grid grid-cols-[1fr_760px] gap-[80px]">
       <div>
@@ -224,7 +288,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 6 · Демо: главный экран */
-  <Frame key="demo-dashboard" n={8}>
+  <Frame key="demo-dashboard" n={10}>
     <div className="grid h-full grid-cols-[480px_1fr] gap-[72px]">
       <div className="pt-2">
         <Eyebrow>Продукт</Eyebrow>
@@ -239,7 +303,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 7 · Демо: сценарии */
-  <Frame key="demo-flows" n={9}>
+  <Frame key="demo-flows" n={11}>
     <Eyebrow>Продукт</Eyebrow>
     <Title className="mt-8 text-[60px]">Добавить за секунды. Приготовить то, что истекает.</Title>
     <div className="mt-12 grid grid-cols-[1fr_1fr_250px] items-start gap-10">
@@ -260,7 +324,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 8 · Как работают рекомендации */
-  <Frame key="engine" n={10}>
+  <Frame key="engine" n={12}>
     <Eyebrow>Рекомендации</Eyebrow>
     <Title className="mt-8 max-w-[1500px] text-[68px]">Рекомендации строятся по правилам, которые можно прочитать.</Title>
     <div className="mt-14 grid grid-cols-[1.15fr_1fr] gap-12">
@@ -303,7 +367,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* · Savi, 1 of 2: who Savi is */
-  <Frame key="savi" n={11}>
+  <Frame key="savi" n={13}>
     <div className="grid h-full grid-cols-[1fr_760px] items-center gap-[80px]">
       <div>
         <Eyebrow>Savi · часть SAVORA</Eyebrow>
@@ -333,7 +397,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* · Savi, 2 of 2: how Savi grows */
-  <Frame key="savi-growth" n={12}>
+  <Frame key="savi-growth" n={14}>
     <Eyebrow>Savi растёт</Eyebrow>
     <Title className="mt-8 text-[64px]">Чем больше еды вы спасаете, тем сильнее Savi.</Title>
     <div data-a className="mt-10 flex items-end justify-between rounded-[32px] bg-[radial-gradient(ellipse_at_50%_100%,#f3e3c3,transparent_70%)] px-10 pb-6 pt-8">
@@ -364,7 +428,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 9 · Архитектура */
-  <Frame key="architecture" n={13}>
+  <Frame key="architecture" n={15}>
     <Eyebrow>Архитектура</Eyebrow>
     <Title className="mt-8 text-[68px]">Настоящий бэкенд. Защита — на уровне базы данных.</Title>
     <div className="relative mt-16 grid grid-cols-[1fr_1.5fr_1fr] items-stretch gap-[72px]">
@@ -415,7 +479,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 10 · Ценность */
-  <Frame key="value" n={14}>
+  <Frame key="value" n={16}>
     <Eyebrow>Ценность</Eyebrow>
     <Title className="mt-8 max-w-[1500px]">На каждую причину потерь — своя функция.</Title>
     <div className="mt-14 border-t-2 border-ink">
@@ -435,7 +499,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 11 · Честность */
-  <Frame key="honesty" n={15}>
+  <Frame key="honesty" n={17}>
     <Eyebrow>Принципы</Eyebrow>
     <div className="mt-12 grid grid-cols-[1fr_1fr] gap-[100px]">
       <Title>Savora следит за датами. Последнее слово — за вами.</Title>
@@ -456,7 +520,7 @@ export const SLIDES: ReactNode[] = [
   </Frame>,
 
   /* 12 · Итог */
-  <Frame key="closing" n={16} dark>
+  <Frame key="closing" n={18} dark>
     <div className="flex h-full flex-col justify-center">
       {/* eslint-disable-next-line @next/next/no-img-element -- brand wordmark */}
       <img data-a src="/brand/wordmark-light.webp" alt="SAVORA" className="h-[72px] w-auto self-start" />
