@@ -204,15 +204,15 @@
     </div>
     <div class="card" style="padding:32px;">
       <span class="num">Supabase</span>
-      <h3 style="margin:18px 0 18px; font-size:30px;">Postgres + Auth</h3>
-      <p style="font-size:20px;">Row Level Security on every table. Atomic RPC functions for discard, consume and put-away.</p>
+      <h3 style="margin:18px 0 18px; font-size:30px;">Postgres, Auth, Vault</h3>
+      <p style="font-size:20px;">Row Level Security on every table. Atomic RPC functions. pg_cron + pg_net wake the server hourly for push reminders; the secret lives in Vault.</p>
     </div>
   </div>
   <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:24px; margin-top:24px;">
     <div style="border-top:2px solid var(--line-strong); padding-top:18px;"><h3 style="font-size:24px;">User JWT on every query</h3><p style="font-size:19px; margin-top:6px;">Only the publishable key is used. No service-role key exists in the app.</p></div>
     <div style="border-top:2px solid var(--line-strong); padding-top:18px;"><h3 style="font-size:24px;">Constraints &amp; indexes</h3><p style="font-size:19px; margin-top:6px;">Enums, checks, date columns, a unique index that blocks duplicate list items.</p></div>
     <div style="border-top:2px solid var(--line-strong); padding-top:18px;"><h3 style="font-size:24px;">Date-only logic</h3><p style="font-size:19px; margin-top:6px;">Whole-day arithmetic in the viewer's time zone. No off-by-one errors.</p></div>
-    <div style="border-top:2px solid var(--line-strong); padding-top:18px;"><h3 style="font-size:24px;">Tested</h3><p style="font-size:19px; margin-top:6px;">53 unit tests and a 16-step Playwright end-to-end run.</p></div>
+    <div style="border-top:2px solid var(--line-strong); padding-top:18px;"><h3 style="font-size:24px;">Tested</h3><p style="font-size:19px; margin-top:6px;">91 unit tests and a 21-step Playwright end-to-end run.</p></div>
   </div>
   <div class="foot"><span>Savora</span><span>10</span></div>
 </section>

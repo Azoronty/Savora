@@ -11,10 +11,10 @@ const NAV = [
   { href: "/app", label: "Today", icon: LayoutDashboard, mobile: true },
   { href: "/app/inventory", label: "Inventory", icon: Refrigerator, mobile: true },
   { href: "/app/expiring", label: "Use soon", icon: Hourglass, mobile: false },
-  { href: "/app/plan", label: "Rescue plan", icon: CalendarCheck, mobile: false },
+  { href: "/app/plan", label: "Rescue plan", icon: CalendarCheck, mobile: true },
   { href: "/app/meals", label: "Meals", icon: CookingPot, mobile: true },
   { href: "/app/shopping", label: "Shopping", icon: ShoppingBasket, mobile: true },
-  { href: "/app/waste", label: "Waste log", icon: Recycle, mobile: true },
+  { href: "/app/waste", label: "Waste log", icon: Recycle, mobile: false }, // phones: via the Today stat card
   { href: "/app/predict", label: "Predictive", icon: Telescope, mobile: false },
   { href: "/app/savi", label: "Savi", icon: Sprout, mobile: false },
 ];

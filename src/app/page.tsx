@@ -1,11 +1,10 @@
-import { ArrowRight, BookOpen, Check, CookingPot, Hourglass, Recycle, Refrigerator, ShoppingBasket, Sparkles } from "lucide-react";
+import { ArrowRight, Bell, BookOpen, CalendarCheck, Check, CookingPot, Mic, Recycle, Refrigerator, ShoppingBasket, Sparkles, Telescope } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Logo, LogoMark } from "@/components/brand/logo";
 import { DemoButton } from "@/components/auth/demo-button";
 import { LandingMotion } from "@/components/landing/landing-motion";
 import { LinkButton } from "@/components/ui/button";
-import { StatusPill } from "@/components/ui/status";
 import { getViewer } from "@/lib/data/session";
 
 const PROBLEMS = [
@@ -15,10 +14,17 @@ const PROBLEMS = [
   { title: "No plan for leftovers", body: "Ingredients need a meal to go into. Without an idea, they sit until they're past using." },
 ];
 
-const STEPS = [
-  { n: "01", title: "Add food in seconds", body: "Type a name. Savora fills in the category, where it's stored and a sensible date, and you adjust anything to match the package." },
-  { n: "02", title: "See what needs using", body: "Everything is sorted by its date. The week ahead shows what reaches its date, and when." },
-  { n: "03", title: "Cook it, or shop smarter", body: "Get meals built around what expires first. Missing ingredients go to a shopping list that checks what's already at home." },
+const FACTS = [
+  { value: "1.05 bn t", label: "of food wasted worldwide in 2022", source: "UNEP 2024" },
+  { value: "60%", label: "of it thrown away at home", source: "UNEP 2024" },
+  { value: "79 kg", label: "per person, per year, at home", source: "UNEP 2024" },
+  { value: "73%", label: "of food thrown away at home was still edible", source: "WRAP, UK" },
+];
+
+const PLAN_PREVIEW = [
+  { day: "Today", meal: "Berry & banana smoothie", uses: "yogurt · bananas · strawberries" },
+  { day: "Tomorrow", meal: "Spinach & feta omelette", uses: "spinach · feta" },
+  { day: "Thursday", meal: "Creamy mushroom pasta", uses: "mushrooms · cream" },
 ];
 
 export default async function LandingPage() {
@@ -62,7 +68,7 @@ export default async function LandingPage() {
           <div>
             <p data-hero className="eyebrow mb-6 flex items-center gap-2">
               <span className="h-px w-6 bg-saffron" aria-hidden="true" />
-              Household food, managed with care
+              Plan the week around what you already have
             </p>
             <h1 data-hero className="text-[3rem] font-light leading-[0.98] tracking-[-0.025em] sm:text-[4.25rem] lg:text-[5rem]">
               Know your kitchen.
@@ -70,7 +76,7 @@ export default async function LandingPage() {
               <em className="font-normal italic text-forest-mid">Waste less of it.</em>
             </h1>
             <p data-hero className="mt-7 max-w-[30rem] text-lg leading-relaxed text-ink-2">
-              Savora keeps track of the food you already have, shows what needs using first, and suggests meals built around it.
+              Savora plans your meals so everything is cooked before its date, reminds you every morning, and lets you add a whole shop in one sentence.
             </p>
             <div data-hero className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-start">
               {viewer ? (
@@ -106,42 +112,48 @@ export default async function LandingPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-forest-deep/25 via-transparent to-transparent" aria-hidden="true" />
             </div>
 
-            {/* A real slice of the product UI */}
+            {/* A real slice of the product: the rescue plan */}
             <div
               data-hero-card
-              className="absolute -bottom-10 left-4 right-4 rounded-2xl border border-line bg-card/95 p-5 shadow-lift backdrop-blur sm:left-auto sm:right-8 sm:w-[22rem] lg:-left-12 lg:right-auto"
+              className="absolute -bottom-10 left-4 right-4 rounded-2xl border border-line bg-card/95 p-5 shadow-lift backdrop-blur sm:left-auto sm:right-8 sm:w-[23rem] lg:-left-12 lg:right-auto"
             >
               <div className="mb-4 flex items-center justify-between">
-                <p className="eyebrow">Use within 3 days</p>
-                <Hourglass className="size-4 text-soon" aria-hidden="true" />
+                <p className="eyebrow">Rescue plan · this week</p>
+                <CalendarCheck className="size-4 text-forest-mid" aria-hidden="true" />
               </div>
-              <ul className="flex flex-col gap-3">
-                {[
-                  { name: "Baby spinach", meta: "150 g · Fridge", label: "1 day left", status: "soon" as const },
-                  { name: "Cherry tomatoes", meta: "250 g · Pantry", label: "2 days left", status: "soon" as const },
-                  { name: "Feta", meta: "200 g · Fridge", label: "3 days left", status: "soon" as const },
-                ].map((item) => (
-                  <li key={item.name} className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium">{item.name}</p>
-                      <p className="text-xs text-muted">{item.meta}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="hidden text-xs text-ink-2 tabular sm:inline">{item.label}</span>
-                      <StatusPill status={item.status} />
-                    </div>
+              <ol className="flex flex-col gap-3">
+                {PLAN_PREVIEW.map((d) => (
+                  <li key={d.day} className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3">
+                    <span className="pt-0.5 font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-muted">{d.day}</span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium">{d.meal}</span>
+                      <span className="block truncate text-xs text-soon">{d.uses}</span>
+                    </span>
                   </li>
                 ))}
-              </ul>
+              </ol>
               <div className="mt-4 flex items-start gap-2.5 rounded-lg bg-forest p-3.5 text-card">
                 <Sparkles className="mt-0.5 size-4 shrink-0 text-saffron" aria-hidden="true" />
                 <p className="text-sm leading-snug">
-                  <span className="font-medium">Spinach &amp; feta omelette</span>
-                  <span className="block text-card/75">Uses all three · 12 minutes</span>
+                  <span className="font-medium">25 of 27 items used in time</span>
+                  <span className="block text-card/75">The item with the least time left is planned first</span>
                 </p>
               </div>
             </div>
           </div>
+        </section>
+
+        {/* Scale */}
+        <section aria-label="The scale of household food waste" className="mx-auto max-w-[1240px] px-5 pb-16 pt-6 sm:px-8 lg:pb-20">
+          <ul className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line lg:grid-cols-4">
+            {FACTS.map((f) => (
+              <li key={f.value} data-reveal className="bg-card p-5 sm:p-6">
+                <p className="font-display text-[2.2rem] font-light leading-none text-forest tabular sm:text-[2.6rem]">{f.value}</p>
+                <p className="mt-2 text-sm text-ink-2">{f.label}</p>
+                <p className="mt-2 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-saffron">{f.source}</p>
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* Problem */}
@@ -165,22 +177,55 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* How it works */}
+        {/* What makes Savora different */}
         <section id="how" aria-labelledby="how-heading" className="mx-auto max-w-[1240px] scroll-mt-8 px-5 py-20 sm:px-8 lg:py-28">
-          <div data-reveal className="mb-14 max-w-2xl">
-            <p className="eyebrow mb-4">How it works</p>
+          <div data-reveal className="mb-14 max-w-3xl">
+            <p className="eyebrow mb-4">What makes Savora different</p>
             <h2 id="how-heading" className="text-[2.4rem] font-light leading-[1.05] sm:text-[2.9rem]">
-              A clear picture of home, and a plan for using it.
+              It doesn’t just remind you of dates. It plans how to use everything in time.
             </h2>
           </div>
-          <ol className="grid gap-4 md:grid-cols-3">
-            {STEPS.map((s) => (
-              <li key={s.n} data-reveal className="flex flex-col rounded-2xl border border-line bg-card p-7">
-                <span className="font-display text-5xl font-light text-saffron tabular">{s.n}</span>
-                <h3 className="mt-8 text-[1.45rem] font-normal">{s.title}</h3>
-                <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted">{s.body}</p>
-              </li>
-            ))}
+          <ol className="grid gap-4 lg:grid-cols-3">
+            <li data-reveal className="flex flex-col rounded-2xl border border-line bg-card p-7">
+              <span className="font-display text-5xl font-light text-saffron tabular">01</span>
+              <h3 className="mt-6 text-[1.45rem] font-normal">A rescue plan for the week</h3>
+              <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted">
+                Meals are scheduled by deadline, so the food with the least time left is cooked first. Anything no meal fits gets a step: freeze it, eat it or add it to a soup.
+              </p>
+              <div className="mt-6 rounded-xl bg-paper-deep/70 p-4 text-sm">
+                <p className="flex justify-between"><span className="text-muted">Reach their date this week</span><span className="font-medium tabular">27</span></p>
+                <p className="mt-1.5 flex justify-between"><span className="text-muted">Used in time with the plan</span><span className="font-medium text-fresh tabular">25</span></p>
+              </div>
+            </li>
+            <li data-reveal className="flex flex-col rounded-2xl border border-line bg-card p-7">
+              <span className="font-display text-5xl font-light text-saffron tabular">02</span>
+              <h3 className="mt-6 text-[1.45rem] font-normal">A reminder every morning</h3>
+              <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted">
+                A real push notification at the hour you choose, in your time zone: what reaches its date by tomorrow and today’s rescue meal. It arrives even when the site is closed.
+              </p>
+              <div className="mt-6 flex gap-3 rounded-xl border border-line bg-paper p-3.5 shadow-soft">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-forest text-card"><Bell className="size-4" aria-hidden="true" /></span>
+                <span className="min-w-0 text-sm leading-snug">
+                  <span className="block font-medium">3 items reach their date by tomorrow</span>
+                  <span className="block text-muted">Today’s rescue meal: spinach &amp; feta omelette (12 min).</span>
+                </span>
+              </div>
+            </li>
+            <li data-reveal className="flex flex-col rounded-2xl border border-line bg-card p-7">
+              <span className="font-display text-5xl font-light text-saffron tabular">03</span>
+              <h3 className="mt-6 text-[1.45rem] font-normal">A whole shop in one sentence</h3>
+              <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted">
+                Say it or type it, in English or Russian. Savora splits it into products with amounts, storage and a typical date, ready to save in one tap.
+              </p>
+              <div className="mt-6 rounded-xl border border-line bg-paper p-3.5 text-sm">
+                <p className="flex items-center gap-2 text-ink-2"><Mic className="size-4 shrink-0 text-forest-mid" aria-hidden="true" /> “milk 2 litres eggs 10 spinach”</p>
+                <p className="mt-3 flex flex-wrap gap-1.5">
+                  {["Milk · 2 L", "Eggs · 10", "Spinach · 200 g"].map((c) => (
+                    <span key={c} className="rounded-full bg-forest-wash px-2.5 py-1 text-xs font-medium text-forest-mid">{c}</span>
+                  ))}
+                </p>
+              </div>
+            </li>
           </ol>
         </section>
 
@@ -192,19 +237,25 @@ export default async function LandingPage() {
                 <div>
                   <p className="eyebrow mb-4 !text-card/60">What’s inside</p>
                   <h2 id="features-heading" className="text-[2.4rem] font-light leading-[1.05] text-card sm:text-[2.9rem]">
-                    Five tools that share one inventory.
+                    Everything reads the same kitchen.
                   </h2>
                 </div>
                 <p className="max-w-md text-card/75 lg:justify-self-end">
-                  The shopping list knows what you already have, and the meal ideas know what’s about to expire, because both read the same kitchen.
+                  The plan, the shopping list and the meal ideas all know what you have and what is about to expire, because they share one inventory backed by a real database.
                 </p>
               </div>
               <ul className="grid gap-px overflow-hidden rounded-2xl border border-card/10 bg-card/10 sm:grid-cols-2 lg:grid-cols-3">
-                <Feature icon={<Refrigerator />} title="Inventory">
-                  Fridge, freezer and pantry in one list. Search, filter and sort by date, name or category.
+                <Feature icon={<CalendarCheck />} title="Rescue plan">
+                  One to three meals a day for the next week, scheduled by deadline, with the reason for every meal and what it saves.
                 </Feature>
-                <Feature icon={<Hourglass />} title="Expiry tracking">
-                  Clear Fresh, Use soon and Past date states, a seven-day timeline and a dedicated use-soon view.
+                <Feature icon={<Bell />} title="Morning reminders">
+                  Web push sent by the server every morning at your chosen hour, with what to use and what to cook. A test button proves it works.
+                </Feature>
+                <Feature icon={<Mic />} title="Voice and one-line entry">
+                  Speak or type a shop in English or Russian. Your usual items are one tap away.
+                </Feature>
+                <Feature icon={<Refrigerator />} title="Inventory and dates">
+                  Fridge, freezer and pantry in one list with Fresh, Use soon and Past date states and a seven-day timeline.
                 </Feature>
                 <Feature icon={<CookingPot />} title="Meal suggestions">
                   Recipes ranked by what expires first, with matched and missing ingredients and the reason each one is suggested.
@@ -213,10 +264,13 @@ export default async function LandingPage() {
                   Stops duplicates, warns when you already have something, and moves bought items into the inventory.
                 </Feature>
                 <Feature icon={<Recycle />} title="Waste log">
-                  Record what you throw away and why. See trends, categories and the value of what you logged.
+                  Record what you throw away and why. See weekly trends, categories and the value of what you logged.
+                </Feature>
+                <Feature icon={<Telescope />} title="Predictive Kitchen">
+                  Learns from your own history which foods tend to go unused and suggests buying a smaller amount.
                 </Feature>
                 <Feature icon={<BookOpen />} title="Explainable by design">
-                  Every suggestion says why it was picked, and every number comes from data you entered.
+                  No black box: every suggestion says why it was picked, and every number comes from data you entered.
                 </Feature>
               </ul>
             </div>
@@ -234,7 +288,7 @@ export default async function LandingPage() {
                 </h2>
               </div>
               <p data-reveal className="max-w-md text-ink-2 lg:justify-self-end">
-                Savi lives in the corner of the app, reacts to what you do and points you to what needs using. Rescue an item or cook from what you have, and Savi earns XP and changes form. Its XP comes only from real actions.
+                Savi gives you a guided tour on your first visit, lives in the corner of the app and reacts to what you do. Rescue food or cook from what you have, and Savi grows through seven forms, up to a Food Mage and the Food Guardian. Its XP comes only from real actions.
               </p>
             </div>
             <ol data-reveal className="-mb-2 flex items-end gap-3 overflow-x-auto px-6 pb-8 pt-10 sm:justify-between sm:px-10 lg:px-14">

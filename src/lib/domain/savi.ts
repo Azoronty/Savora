@@ -138,7 +138,7 @@ export const SAVI_TOUR: { href?: string; spot?: string; text: string; anywhere?:
   { href: "/app/plan", spot: "main section[aria-label='Plan impact']", anywhere: true, text: "The rescue plan schedules your meals so everything is cooked before its date. Turn on the morning reminder here." },
   { href: "/app/meals", spot: "main a[href^='/app/meals/']", text: "Meals are ranked by what expires first. \"I cooked this\" updates your stock." },
   { href: "/app/shopping", spot: "main form:has(#shopping-name)", text: "Add to the shopping list here. It blocks duplicates and warns when something is already at home." },
-  { href: "/app/waste", spot: "main section[aria-label='Summary']", text: "If food gets thrown away, log it. These numbers show what you lose and why." },
+  { href: "/app/waste", spot: "main section[aria-label='Summary']", anywhere: true, text: "If food gets thrown away, log it. These numbers show what you lose and why." },
   { text: "That's the tour! Tap me any time for a food-saving tip." },
 ];
 

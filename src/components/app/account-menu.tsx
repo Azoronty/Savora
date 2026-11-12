@@ -1,4 +1,4 @@
-import { LogOut, Sprout, Telescope } from "lucide-react";
+import { LogOut, Sprout, Telescope, Recycle } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "@/lib/actions/account";
 import type { Viewer } from "@/lib/data/session";
@@ -49,6 +49,9 @@ export function MobileAccountMenu({ viewer }: { viewer: Viewer }) {
         </Link>
         <Link href="/app/predict" className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-ink-2 hover:bg-paper-deep">
           <Telescope className="size-4" aria-hidden="true" /> Predictive Kitchen
+        </Link>
+        <Link href="/app/waste" className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-ink-2 hover:bg-paper-deep">
+          <Recycle className="size-4" aria-hidden="true" /> Waste log
         </Link>
         <form action={signOut} className="border-t border-line pt-3">
           <button type="submit" className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-ink-2 hover:bg-paper-deep">

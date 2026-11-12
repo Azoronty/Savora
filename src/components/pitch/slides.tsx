@@ -178,32 +178,21 @@ export const SLIDES: ReactNode[] = [
   /* 5 · Возможности */
   <Frame key="features" n={6}>
     <Eyebrow>Возможности</Eyebrow>
-    <Title className="mt-10">Пять инструментов на одних данных.</Title>
-    <div className="mt-16 grid grid-cols-5 gap-6">
+    <Title className="mt-10">Шесть инструментов на одних данных.</Title>
+    <div className="mt-14 grid grid-cols-3 gap-6">
       {[
-        ["Инвентарь", "Быстрый ввод", "Пишете «шпинат» — категория, место хранения, единица и типичный срок заполняются сами. Поиск, фильтры, сортировка."],
-        ["Сроки", "Понятные статусы", "«Свежее», «Использовать скоро» (до 3 дней) и «Срок прошёл». Календарь на неделю и отдельная страница."],
-        ["Блюда", "С объяснением", "24 рецепта в порядке срочности. У каждого видно, что есть, чего не хватает и почему он предложен."],
-        ["Покупки", "Без дублей", "Добавляет недостающее из рецепта, предупреждает о запасах дома и переносит купленное в инвентарь."],
-        ["Журнал", "Честные цифры", "Количество, причина, дата и стоимость, если известна цена. Графики строятся только по записям."],
+        ["План спасения", "Блюда по дедлайнам", "1–3 приёма пищи в день на неделю. Первым готовится то, у чего меньше всего времени. У каждого блюда — причина."],
+        ["Уведомления", "Утренний push", "Сервер сам присылает в выбранный час: что истекает к завтра и что приготовить. Даже при закрытом сайте."],
+        ["Ввод", "Голосом или строкой", "«Молоко 2 литра, яйца 10 штук, шпинат» — и всё в списке с количеством и сроком. Русский и английский."],
+        ["Сроки", "Понятные статусы", "«Свежее», «Использовать скоро» (до 3 дней), «Срок прошёл». Календарь на неделю и своя иконка у каждого продукта."],
+        ["Блюда и покупки", "С объяснением, без дублей", "24 рецепта по срочности. Недостающее — в список покупок, который знает, что уже есть дома."],
+        ["Журнал и прогноз", "Честные цифры", "Что и почему выброшено, тренды по неделям. Predictive Kitchen подсказывает, что брать меньше."],
       ].map(([k, t, d]) => (
         <div data-a key={k} className="flex flex-col rounded-[24px] border border-line bg-card p-8">
           <span className="font-mono text-[17px] text-saffron">{k}</span>
-          <h3 className="mt-5 font-display text-[32px] font-normal leading-tight">{t}</h3>
-          <p className="mt-4 text-[21px] leading-[1.5] text-ink-2">{d}</p>
+          <h3 className="mt-4 font-display text-[32px] font-normal leading-tight">{t}</h3>
+          <p className="mt-3 text-[21px] leading-[1.45] text-ink-2">{d}</p>
         </div>
-      ))}
-    </div>
-    <div data-a className="mt-10 flex gap-4">
-      {[
-        ["bg-fresh-soft text-fresh", "bg-fresh", "Свежее"],
-        ["bg-soon-soft text-soon", "bg-saffron", "Использовать скоро"],
-        ["bg-expired-soft text-expired", "bg-expired", "Срок прошёл"],
-      ].map(([c, d, t]) => (
-        <span key={t} className={`inline-flex h-11 items-center gap-3 rounded-full px-5 text-[20px] font-medium ${c}`}>
-          <span className={`size-2.5 rounded-full ${d}`} />
-          {t}
-        </span>
       ))}
     </div>
   </Frame>,
@@ -241,7 +230,7 @@ export const SLIDES: ReactNode[] = [
         <Eyebrow>Продукт</Eyebrow>
         <Title className="mt-8 text-[54px]">Главный экран отвечает на вопрос: что пора использовать?</Title>
         <p data-a className="mt-8 text-[24px] leading-[1.5] text-ink-2">
-          Заголовок, четыре показателя и календарь на неделю считаются по данным семьи. Ниже — блюда и подсказки из того же инвентаря.
+          Сверху — сколько продуктов дойдёт до срока и план на сегодня. Ниже — показатели, календарь на неделю и блюда из того же инвентаря.
         </p>
         <p data-a className="mt-6 text-[19px] text-muted">Скриншот работающего приложения, демо-кухня.</p>
       </div>
@@ -255,8 +244,8 @@ export const SLIDES: ReactNode[] = [
     <Title className="mt-8 text-[60px]">Добавить за секунды. Приготовить то, что истекает.</Title>
     <div className="mt-12 grid grid-cols-[1fr_1fr_250px] items-start gap-10">
       <div>
-        <Shot src="/pitch/add-product.jpg" alt="Добавление продукта с автозаполнением" className="w-full" />
-        <p data-a className="mt-5 text-[21px] text-ink-2">Каталог из ~90 продуктов подставляет детали.</p>
+        <Shot src="/pitch/add-product.jpg" alt="Быстрый ввод одной фразой" className="w-full" />
+        <p data-a className="mt-5 text-[21px] text-ink-2">Голосом или строкой: фраза сама делится на продукты.</p>
       </div>
       <div>
         <Shot src="/pitch/recipe.jpg" alt="Рецепт с объяснением" className="w-full" />
@@ -264,8 +253,8 @@ export const SLIDES: ReactNode[] = [
       </div>
       <div>
         {/* eslint-disable-next-line @next/next/no-img-element -- slide canvas */}
-        <img data-a src="/pitch/mobile-inventory.jpg" alt="Инвентарь на телефоне" className="block w-full rounded-[38px] border-[10px] border-forest-deep shadow-lift" />
-        <p data-a className="mt-5 text-[21px] text-ink-2">Адаптивный дизайн с нижней навигацией.</p>
+        <img data-a src="/pitch/mobile-inventory.jpg" alt="План спасения на телефоне" className="block w-full rounded-[38px] border-[10px] border-forest-deep shadow-lift" />
+        <p data-a className="mt-5 text-[21px] text-ink-2">Телефон: план спасения в нижнем меню.</p>
       </div>
     </div>
   </Frame>,
@@ -393,9 +382,9 @@ export const SLIDES: ReactNode[] = [
         <div className="mt-5 grid grid-cols-2 gap-3">
           {[
             ["proxy.ts", "Обновление сессии, защита маршрутов"],
-            ["Server Components", "Чтение через слой данных"],
             ["Server Actions", "Валидация Zod, типизированные ответы"],
-            ["Доменная логика", "Сроки, ранжирование, статистика"],
+            ["Доменная логика", "План спасения, рецепты, разбор фраз"],
+            ["/api/reminders/run", "Зовёт база каждый час, шлёт web push"],
           ].map(([t, d]) => (
             <div key={t} className="rounded-2xl bg-card/[0.08] p-5">
               <p className="font-display text-[26px] text-card">{t}</p>
@@ -406,8 +395,8 @@ export const SLIDES: ReactNode[] = [
       </div>
       <div data-a className="rounded-[26px] border border-line bg-card p-9">
         <span className="font-mono text-[17px] text-saffron">Supabase</span>
-        <h3 className="mt-4 font-display text-[34px] font-normal">Postgres + Auth</h3>
-        <p className="mt-4 text-[21px] leading-[1.5] text-ink-2">Row Level Security на каждой таблице. Атомарные функции: списать, выбросить, разложить покупки.</p>
+        <h3 className="mt-4 font-display text-[34px] font-normal">Postgres, Auth, Vault</h3>
+        <p className="mt-4 text-[21px] leading-[1.5] text-ink-2">RLS на каждой таблице. Атомарные функции. pg_cron + pg_net каждый час будят сервер; секрет — в Vault.</p>
       </div>
     </div>
     <div className="mt-14 grid grid-cols-4 gap-8">
@@ -415,7 +404,7 @@ export const SLIDES: ReactNode[] = [
         ["JWT пользователя", "Только публичный ключ. Сервисного ключа в приложении нет."],
         ["Ограничения и индексы", "Enum, CHECK, тип date, уникальный индекс против дублей."],
         ["Даты без сдвигов", "Расчёт целыми днями в часовом поясе пользователя."],
-        ["Тесты", "53 unit-теста и сквозной сценарий Playwright из 16 шагов."],
+        ["Тесты", "91 unit-тест и сквозной сценарий Playwright из 21 шага."],
       ].map(([t, d]) => (
         <div data-a key={t} className="border-t-2 border-line-strong pt-5">
           <h3 className="font-display text-[27px] font-normal">{t}</h3>

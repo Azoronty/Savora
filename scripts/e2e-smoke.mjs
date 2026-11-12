@@ -217,6 +217,48 @@ await step("Predictive Kitchen: patterns, waste risk, smart quantity", async () 
   await page.getByText("May go unused").first().waitFor();
 });
 
+await step("rescue plan schedules the week and explains leftovers", async () => {
+  await go(`/app/plan`);
+  const impact = page.locator("section[aria-label='Plan impact']");
+  await impact.waitFor();
+  if (!/Used in time with this plan/.test(await impact.innerText())) throw new Error("plan impact numbers missing");
+  await page.getByRole("heading", { name: "Today" }).waitFor();
+  await page.getByRole("heading", { name: "Tomorrow" }).waitFor();
+  await page.getByRole("link", { name: /1 meal\/day/ }).click();
+  await page.waitForURL(/meals=1/);
+  await page.getByRole("heading", { name: /rescue them another way/ }).waitFor();
+  await shot("plan");
+});
+
+await step("morning reminder card is on the plan", async () => {
+  await go(`/app/plan`);
+  await page.getByRole("heading", { name: /push notification when/ }).waitFor();
+  await page.getByText("Devices registered").waitFor();
+});
+
+await step("quick add: one sentence becomes several products", async () => {
+  await go(`/app`);
+  await page.getByRole("button", { name: "Add product" }).first().click();
+  await page.getByRole("button", { name: /Several/ }).click();
+  await page.getByLabel("Say or type everything you bought").fill("молоко 2 литра яйца 10 штук шпинат");
+  const rows = page.getByRole("list", { name: "Items to add" }).locator("li");
+  await rows.nth(2).waitFor();
+  if ((await rows.count()) !== 3) throw new Error(`expected 3 parsed items, got ${await rows.count()}`);
+  await page.getByRole("button", { name: "Add 3 products" }).click();
+  await toast("3 products added");
+  await go(`/app/inventory?q=${encodeURIComponent("Молоко")}`);
+  await page.getByText("Молоко").first().waitFor();
+});
+
+await step("Savi demo level-up moves to the next stage", async () => {
+  await go(`/app/savi`);
+  const stageName = page.locator("main section").first().locator("h2");
+  const before = await stageName.innerText();
+  await page.getByRole("button", { name: "Level up Savi" }).click();
+  await toast(/Savi reached stage/);
+  await page.waitForFunction((prev) => document.querySelector("main section h2")?.textContent !== prev, before);
+});
+
 await step("data persists after reload", async () => {
   await go(`/app/waste`);
   await page.reload();
@@ -230,7 +272,7 @@ for (const [name, viewport] of [
 ]) {
   await step(`responsive ${name}`, async () => {
     await page.setViewportSize(viewport);
-    for (const path of ["/app", "/app/inventory", "/app/meals", "/app/shopping", "/app/waste"]) {
+    for (const path of ["/app", "/app/inventory", "/app/plan", "/app/meals", "/app/shopping", "/app/waste"]) {
       await go(path);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       if (overflow > 1) throw new Error(`${path} overflows horizontally by ${overflow}px at ${name}`);
