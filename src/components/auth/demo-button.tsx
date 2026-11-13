@@ -4,11 +4,13 @@ import { ArrowRight } from "lucide-react";
 import { useState, useTransition } from "react";
 import { startDemo } from "@/lib/actions/account";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/components/i18n/lang-provider";
 
 /** Starts an anonymous demo session with a sample kitchen. */
 export function DemoButton({ variant = "primary", label = "Explore the live demo" }: { variant?: "primary" | "secondary"; label?: string }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const t = useT();
   return (
     <div className="flex flex-col">
       <Button
@@ -24,12 +26,12 @@ export function DemoButton({ variant = "primary", label = "Explore the live demo
           })
         }
       >
-        {pending ? "Preparing your kitchen…" : label}
+        {t(pending ? "Preparing your kitchen…" : label)}
         {!pending && <ArrowRight className="size-4" aria-hidden="true" />}
       </Button>
       {error && (
         <p role="alert" className="mt-2 text-sm text-expired">
-          {error}
+          {t(error)}
         </p>
       )}
     </div>

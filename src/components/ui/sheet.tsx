@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { cx } from "@/lib/cx";
+import { useT } from "@/components/i18n/lang-provider";
 
 type SheetProps = {
   open: boolean;
@@ -20,6 +21,7 @@ type SheetProps = {
  * the right on larger screens.
  */
 export function Sheet({ open, onClose, title, description, children, footer, size = "md" }: SheetProps) {
+  const t = useT();
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -52,14 +54,14 @@ export function Sheet({ open, onClose, title, description, children, footer, siz
           <header className="flex items-start justify-between gap-4 border-b border-line px-5 pb-4 pt-5 sm:px-7 sm:pt-7">
             <div className="min-w-0">
               <h2 id="sheet-title" className="text-[1.6rem] font-medium leading-tight">
-                {title}
+                {t(title)}
               </h2>
-              {description && <div className="mt-1 text-sm text-muted">{description}</div>}
+              {description && <div className="mt-1 text-sm text-muted">{typeof description === "string" ? t(description) : description}</div>}
             </div>
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close"
+              aria-label={t("Close")}
               className="-mr-2 -mt-1 inline-flex size-10 shrink-0 items-center justify-center rounded-md text-muted transition-colors hover:bg-paper-deep hover:text-ink"
             >
               <X className="size-5" />

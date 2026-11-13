@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
 import { cx } from "@/lib/cx";
+import { useT } from "@/components/i18n/lang-provider";
 
 export const controlClass =
   "w-full h-11 rounded-md border border-line-strong bg-card px-3 text-[0.9375rem] text-ink placeholder:text-muted/80 transition-[border-color,box-shadow] duration-150 hover:border-ink-2/60 focus:border-forest-mid focus:outline-none focus:ring-[3px] focus:ring-forest-mid/15 aria-invalid:border-expired aria-invalid:ring-expired/10 disabled:opacity-60";
@@ -14,22 +15,23 @@ type FieldProps = {
   children: ReactNode;
 };
 
-/** Label + control + hint/error, wired up with ids for assistive tech. */
+/** Label + control + hint/error, wired up with ids for assistive tech. Text props are translated here. */
 export function Field({ id, label, error, hint, optional, className, children }: FieldProps) {
+  const t = useT();
   return (
     <div className={cx("flex flex-col gap-1.5", className)}>
       <label htmlFor={id} className="flex items-baseline justify-between text-sm font-medium text-ink-2">
-        <span>{label}</span>
-        {optional && <span className="text-xs font-normal text-muted">Optional</span>}
+        <span>{t(label)}</span>
+        {optional && <span className="text-xs font-normal text-muted">{t("Optional")}</span>}
       </label>
       {children}
       {error ? (
         <p id={`${id}-error`} role="alert" className="text-[0.8125rem] text-expired">
-          {error}
+          {t(error)}
         </p>
       ) : hint ? (
         <p id={`${id}-hint`} className="text-[0.8125rem] text-muted">
-          {hint}
+          {typeof hint === "string" ? t(hint) : hint}
         </p>
       ) : null}
     </div>
@@ -80,9 +82,10 @@ export function Segmented<T extends string>({
   onChange: (value: T) => void;
   label: string;
 }) {
+  const t = useT();
   return (
     <fieldset className="flex flex-col gap-1.5">
-      <legend className="mb-1.5 text-sm font-medium text-ink-2">{label}</legend>
+      <legend className="mb-1.5 text-sm font-medium text-ink-2">{t(label)}</legend>
       <div className="grid auto-cols-fr grid-flow-col gap-1 rounded-lg border border-line-strong bg-paper-deep/60 p-1">
         {options.map((option) => (
           <label
@@ -101,7 +104,7 @@ export function Segmented<T extends string>({
               className="sr-only"
             />
             {option.icon}
-            {option.label}
+            {t(option.label)}
           </label>
         ))}
       </div>

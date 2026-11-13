@@ -10,14 +10,18 @@ import { getExpiry } from "@/lib/domain/expiry";
 import { listProducts, type InventoryQuery, type SortKey, type StatusFilter } from "@/lib/data/queries";
 import { requireViewer } from "@/lib/data/session";
 import { getPrediction } from "@/lib/data/predict";
+import { getT } from "@/lib/i18n/server";
 
-export const metadata: Metadata = { title: "Inventory" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT())("Inventory") };
+}
 
 const pickOne = <T extends string>(value: unknown, allowed: readonly T[]): T | undefined =>
   typeof value === "string" && (allowed as readonly string[]).includes(value) ? (value as T) : undefined;
 
 export default async function InventoryPage({ searchParams }: PageProps<"/app/inventory">) {
   const viewer = await requireViewer();
+  const t = await getT();
   const params = await searchParams;
   const query: InventoryQuery = {
     q: typeof params.q === "string" ? params.q.slice(0, 80) : undefined,
@@ -41,15 +45,15 @@ export default async function InventoryPage({ searchParams }: PageProps<"/app/in
   return (
     <>
       <PageHeader
-        eyebrow={`${everything.length} products`}
+        eyebrow={t(`${everything.length} products`)}
         title="Inventory"
         description="Everything in your fridge, freezer and pantry, sorted by the date that matters most."
-        actions={<QuickAddButton label="Add product" hideOnMobile />}
+        actions={<QuickAddButton label={t("Add product")} hideOnMobile />}
       />
       <InventoryFilters counts={counts} />
 
       {everything.length === 0 ? (
-        <EmptyState icon={<PackageOpen className="size-6" />} title="Nothing here yet" action={<QuickAddButton label="Add your first product" />}>
+        <EmptyState icon={<PackageOpen className="size-6" />} title="Nothing here yet" action={<QuickAddButton label={t("Add your first product")} />}>
           Start with the things you buy most often. It takes a few seconds per item.
         </EmptyState>
       ) : products.length === 0 ? (
@@ -60,9 +64,9 @@ export default async function InventoryPage({ searchParams }: PageProps<"/app/in
         <div className="overflow-hidden rounded-xl border border-line bg-card">
           <div className="hidden grid-cols-[auto_minmax(0,1fr)_8.5rem_7rem_auto] gap-x-4 border-b border-line px-5 py-2.5 sm:grid">
             <span className="w-10" />
-            <span className="eyebrow">Product</span>
-            <span className="eyebrow">Date</span>
-            <span className="eyebrow">Status</span>
+            <span className="eyebrow">{t("Product")}</span>
+            <span className="eyebrow">{t("Date")}</span>
+            <span className="eyebrow">{t("Status")}</span>
             <span className="w-[8.5rem]" />
           </div>
           <ul className="divide-y divide-line">

@@ -7,17 +7,21 @@ import { SmartQuantityButton } from "@/components/predict/smart-quantity-button"
 import { EmptyState } from "@/components/ui/empty-state";
 import { cx } from "@/lib/cx";
 import { formatShortDate } from "@/lib/domain/dates";
+import { getLang, getT } from "@/lib/i18n/server";
 import { formatMoney, formatQuantity } from "@/lib/domain/format";
 import { PREDICT_RULES } from "@/lib/domain/predict";
 import { getPrediction } from "@/lib/data/predict";
 import { requireViewer } from "@/lib/data/session";
 
-export const metadata: Metadata = { title: "Predictive Kitchen" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT())("Predictive Kitchen") };
+}
 
 const pct = (n: number | null) => (n === null ? "—" : `${Math.round(n * 100)}%`);
 
 export default async function PredictPage() {
   const viewer = await requireViewer();
+  const [t, lang] = [await getT(), await getLang()];
   const p = await getPrediction(viewer);
   const ready = p.patterns.filter((x) => x.enoughData);
 
@@ -31,23 +35,22 @@ export default async function PredictPage() {
 
       {p.totalEvents === 0 ? (
         <EmptyState icon={<Telescope className="size-6" />} title="Nothing to learn from yet">
-          Predictive Kitchen learns from real history: each product you add, use or throw away is recorded. After a couple of shopping trips the
-          first patterns appear here.
+          {t("Predictive Kitchen learns from real history: each product you add, use or throw away is recorded. After a couple of shopping trips the first patterns appear here.")}
         </EmptyState>
       ) : (
         <div className="flex flex-col gap-12">
-          <section aria-label="Summary" className="grid grid-cols-2 overflow-hidden rounded-xl border border-line bg-card lg:grid-cols-4">
-            <Figure label="Items with patterns" value={ready.length} note={`${p.learning.length} still learning`} />
-            <Figure label="Recorded events" value={p.totalEvents} note="Bought, used, thrown away" />
-            <Figure label="At risk now" value={p.risks.length} note="From your stock" tone={p.risks.length ? "soon" : undefined} />
-            <Figure label="Smarter amounts" value={p.suggestions.length} note="Overbuy detected" />
+          <section aria-label={t("Summary")} className="grid grid-cols-2 overflow-hidden rounded-xl border border-line bg-card lg:grid-cols-4">
+            <Figure label={t("Items with patterns")} value={ready.length} note={t("{n} still learning", { n: p.learning.length })} />
+            <Figure label={t("Recorded events")} value={p.totalEvents} note={t("Bought, used, thrown away")} />
+            <Figure label={t("At risk now")} value={p.risks.length} note={t("From your stock")} tone={p.risks.length ? "soon" : undefined} />
+            <Figure label={t("Smarter amounts")} value={p.suggestions.length} note={t("Overbuy detected")} />
           </section>
 
           <div className="grid gap-10 lg:grid-cols-2">
             <section aria-labelledby="risk-heading">
-              <SectionTitle id="risk-heading" icon={<Hourglass className="size-4" />} eyebrow="Waste prediction" title="Likely to go unused" />
+              <SectionTitle id="risk-heading" icon={<Hourglass className="size-4" />} eyebrow={t("Waste prediction")} title={t("Likely to go unused")} />
               {p.risks.length === 0 ? (
-                <Note>No item in stock looks at risk based on your history.</Note>
+                <Note>{t("No item in stock looks at risk based on your history.")}</Note>
               ) : (
                 <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-card">
                   {p.risks.map((r) => (
@@ -57,11 +60,11 @@ export default async function PredictPage() {
                       </span>
                       <div className="min-w-0">
                         <p className="font-medium">
-                          {r.name} <span className="ml-1 text-xs font-normal text-muted">{r.level === "high" ? "High risk" : "Watch"}</span>
+                          {t(r.name)} <span className="ml-1 text-xs font-normal text-muted">{t(r.level === "high" ? "High risk" : "Watch")}</span>
                         </p>
-                        <p className="mt-1 text-sm text-muted">{r.reason}</p>
+                        <p className="mt-1 text-sm text-muted">{t(r.reason)}</p>
                         <Link href="/app/meals?filter=rescue" className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-forest-mid hover:underline">
-                          Recipes that use it <ArrowRight className="size-3.5" aria-hidden="true" />
+                          {t("Recipes that use it")} <ArrowRight className="size-3.5" aria-hidden="true" />
                         </Link>
                       </div>
                     </li>
@@ -71,24 +74,24 @@ export default async function PredictPage() {
             </section>
 
             <section aria-labelledby="qty-heading">
-              <SectionTitle id="qty-heading" icon={<Scale className="size-4" />} eyebrow="Overbuy detection" title="Smarter amounts" />
+              <SectionTitle id="qty-heading" icon={<Scale className="size-4" />} eyebrow={t("Overbuy detection")} title={t("Smarter amounts")} />
               {p.suggestions.length === 0 ? (
-                <Note>No repeated overbuying found. Suggestions appear after {PREDICT_RULES.overbuyMinPurchases} purchases of the same item with regular leftovers.</Note>
+                <Note>{t("No repeated overbuying found. Suggestions appear after {n} purchases of the same item with regular leftovers.", { n: PREDICT_RULES.overbuyMinPurchases })}</Note>
               ) : (
                 <ul className="flex flex-col gap-4">
                   {p.suggestions.map((s) => (
                     <li key={`${s.key}-${s.unit}`} className="rounded-xl border border-line bg-card p-5">
                       <div className="flex items-start justify-between gap-4">
                         <p className="font-medium">
-                          {s.name} {p.demoKeys.has(s.key) && <SampleTag />}
+                          {t(s.name)} {p.demoKeys.has(s.key) && <SampleTag />}
                         </p>
                         <p className="shrink-0 font-mono text-sm tabular">
-                          <span className="text-muted line-through decoration-line-strong">{formatQuantity(Math.round(s.usual * 100) / 100, s.unit)}</span>
+                          <span className="text-muted line-through decoration-line-strong">{t(formatQuantity(Math.round(s.usual * 100) / 100, s.unit))}</span>
                           <span className="mx-1.5 text-muted">→</span>
-                          <span className="font-medium text-forest-mid">{formatQuantity(s.suggested, s.unit)}</span>
+                          <span className="font-medium text-forest-mid">{t(formatQuantity(s.suggested, s.unit))}</span>
                         </p>
                       </div>
-                      <p className="mt-2 text-sm text-muted">{s.reason}</p>
+                      <p className="mt-2 text-sm text-muted">{t(s.reason)}</p>
                       <div className="mt-4">
                         <SmartQuantityButton name={s.name} itemKey={s.key} quantity={s.suggested} unit={s.unit} />
                       </div>
@@ -100,14 +103,14 @@ export default async function PredictPage() {
           </div>
 
           <section aria-labelledby="patterns-heading">
-            <SectionTitle id="patterns-heading" icon={<Telescope className="size-4" />} eyebrow="Purchase history & consumption" title="Your patterns" />
+            <SectionTitle id="patterns-heading" icon={<Telescope className="size-4" />} eyebrow={t("Purchase history & consumption")} title={t("Your patterns")} />
             <div className="overflow-x-auto rounded-xl border border-line bg-card">
               <table className="w-full min-w-[720px] text-left text-sm tabular">
                 <thead className="border-b border-line">
                   <tr className="eyebrow">
                     {["Item", "Bought", "Usually", "Every", "Last bought", "Thrown away", "Takes to use", "Confidence"].map((h) => (
                       <th key={h} scope="col" className="px-4 py-3 font-medium">
-                        {h}
+                        {t(h)}
                       </th>
                     ))}
                   </tr>
@@ -117,20 +120,20 @@ export default async function PredictPage() {
                     <tr key={`${x.key}-${x.unit}`} className={cx(!x.enoughData && "text-muted")}>
                       <th scope="row" className="px-4 py-3 font-medium">
                         <span className="flex items-center gap-2">
-                          {x.name}
+                          {t(x.name)}
                           {p.demoKeys.has(x.key) && <SampleTag />}
                         </span>
                       </th>
                       <td className="px-4 py-3">{x.purchases}×</td>
-                      <td className="px-4 py-3">{x.purchases ? formatQuantity(Math.round(x.avgPurchase * 100) / 100, x.unit) : "—"}</td>
-                      <td className="px-4 py-3">{x.intervalDays === null ? "—" : `${Math.round(x.intervalDays)} days`}</td>
-                      <td className="px-4 py-3">{x.lastBought ? formatShortDate(x.lastBought) : "—"}</td>
+                      <td className="px-4 py-3">{x.purchases ? t(formatQuantity(Math.round(x.avgPurchase * 100) / 100, x.unit)) : "—"}</td>
+                      <td className="px-4 py-3">{x.intervalDays === null ? "—" : t("{n} days", { n: Math.round(x.intervalDays) })}</td>
+                      <td className="px-4 py-3">{x.lastBought ? formatShortDate(x.lastBought, lang) : "—"}</td>
                       <td className="px-4 py-3">
                         {pct(x.wasteShare)}
-                        {x.wastedValueCents ? <span className="block text-xs text-muted">{formatMoney(x.wastedValueCents)} recorded</span> : null}
+                        {x.wastedValueCents ? <span className="block text-xs text-muted">{t("{money} recorded", { money: formatMoney(x.wastedValueCents) })}</span> : null}
                       </td>
-                      <td className="px-4 py-3">{x.daysToUse === null ? "—" : `${Math.round(x.daysToUse)} days`}</td>
-                      <td className="px-4 py-3">{x.enoughData ? x.confidence : "Not enough data"}</td>
+                      <td className="px-4 py-3">{x.daysToUse === null ? "—" : t("{n} days", { n: Math.round(x.daysToUse) })}</td>
+                      <td className="px-4 py-3">{t(x.enoughData ? x.confidence : "Not enough data")}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -140,17 +143,16 @@ export default async function PredictPage() {
 
           <section aria-labelledby="method-heading" className="rounded-xl border border-line bg-paper-deep/50 p-6 text-sm text-ink-2">
             <h2 id="method-heading" className="mb-3 font-sans text-base font-medium text-ink">
-              How the predictions work
+              {t("How the predictions work")}
             </h2>
             <ul className="grid gap-2 sm:grid-cols-2">
-              <li>Every product added, used or thrown away is written to a history ledger by the database itself.</li>
-              <li>Patterns need at least {PREDICT_RULES.minPurchases} purchases and 2 recorded outcomes; until then an item shows “Not enough data”.</li>
+              <li>{t("Every product added, used or thrown away is written to a history ledger by the database itself.")}</li>
+              <li>{t("Patterns need at least {n} purchases and 2 recorded outcomes; until then an item shows “Not enough data”.", { n: PREDICT_RULES.minPurchases })}</li>
               <li>
-                Overbuy: {PREDICT_RULES.overbuyMinPurchases}+ purchases and {Math.round(PREDICT_RULES.overbuyMinWasteShare * 100)}%+ thrown away. The smarter amount
-                is your usual amount minus that share, rounded to a sensible step.
+                {t("Overbuy: {n}+ purchases and {p}%+ thrown away. The smarter amount is your usual amount minus that share, rounded to a sensible step.", { n: PREDICT_RULES.overbuyMinPurchases, p: Math.round(PREDICT_RULES.overbuyMinWasteShare * 100) })}
               </li>
-              <li>Waste risk compares how long you usually take to use an item with the days left on its date, and how often it was thrown away before.</li>
-              <li>Money figures come only from prices you entered. Rows tagged Sample come from the demo kitchen’s example history.</li>
+              <li>{t("Waste risk compares how long you usually take to use an item with the days left on its date, and how often it was thrown away before.")}</li>
+              <li>{t("Money figures come only from prices you entered. Rows tagged Sample come from the demo kitchen’s example history.")}</li>
             </ul>
           </section>
         </div>

@@ -14,6 +14,7 @@ import { controlClass } from "@/components/ui/field";
 import { Sheet } from "@/components/ui/sheet";
 import { useAction } from "@/components/ui/toast";
 import type { StockItemsInput } from "@/lib/validation";
+import { useT } from "@/components/i18n/lang-provider";
 import { useSavi } from "@/components/savi/savi-companion";
 
 type Row = { include: boolean; storage: Storage; expires_on: string; price: string; guessed: boolean };
@@ -55,6 +56,7 @@ function StockForm({ items, today, onDone }: { items: ShoppingItem[]; today: str
   const [rows, setRows] = useState(() => initialRows(items, today));
   const [error, setError] = useState<string | null>(null);
   const { run, pending } = useAction();
+  const t = useT();
   const savi = useSavi();
 
   const update = (id: string, patch: Partial<Row>) => setRows((r) => ({ ...r, [id]: { ...r[id], ...patch } }));
@@ -76,11 +78,11 @@ function StockForm({ items, today, onDone }: { items: ShoppingItem[]; today: str
       const row = rows[item.id];
       const cents = parseMoneyToCents(row.price);
       if (Number.isNaN(cents)) {
-        setError(`Check the price for ${item.name}.`);
+        setError(t("Check the price for {name}.", { name: t(item.name) }));
         return;
       }
       if (row.expires_on < today) {
-        setError(`The date for ${item.name} is before today.`);
+        setError(t("The date for {name} is before today.", { name: t(item.name) }));
         return;
       }
       payload.push({
@@ -99,7 +101,7 @@ function StockForm({ items, today, onDone }: { items: ShoppingItem[]; today: str
     if (r.ok) {
       onDone();
       savi({ type: "shopping_stocked", count: payload.length });
-    } else setError(r.error);
+    } else setError(t(r.error));
   };
 
   return (
@@ -116,14 +118,14 @@ function StockForm({ items, today, onDone }: { items: ShoppingItem[]; today: str
                   onChange={(e) => update(item.id, { include: e.target.checked })}
                   className="size-5 accent-forest"
                 />
-                <span className="font-medium">{item.name}</span>
-                <span className="text-sm text-muted tabular">{formatQuantity(Number(item.quantity), item.unit)}</span>
+                <span className="font-medium">{t(item.name)}</span>
+                <span className="text-sm text-muted tabular">{t(formatQuantity(Number(item.quantity), item.unit))}</span>
               </label>
               {row.include && (
                 <div className="grid grid-cols-2 gap-2 pl-8 sm:grid-cols-[1fr_1fr_6.5rem]">
                   <div>
                     <label htmlFor={`st-${item.id}`} className="mb-1 block text-xs text-muted">
-                      Stored in
+                      {t("Stored in")}
                     </label>
                     <select
                       id={`st-${item.id}`}
@@ -133,14 +135,14 @@ function StockForm({ items, today, onDone }: { items: ShoppingItem[]; today: str
                     >
                       {STORAGES.map((s) => (
                         <option key={s} value={s}>
-                          {STORAGE_LABEL[s]}
+                          {t(STORAGE_LABEL[s])}
                         </option>
                       ))}
                     </select>
                   </div>
                   <div>
                     <label htmlFor={`ex-${item.id}`} className="mb-1 block text-xs text-muted">
-                      Package date
+                      {t("Package date")}
                     </label>
                     <input
                       id={`ex-${item.id}`}
@@ -153,7 +155,7 @@ function StockForm({ items, today, onDone }: { items: ShoppingItem[]; today: str
                   </div>
                   <div className="col-span-2 sm:col-span-1">
                     <label htmlFor={`pr-${item.id}`} className="mb-1 block text-xs text-muted">
-                      Price <span className="text-faint">(optional)</span>
+                      {t("Price")} <span className="text-faint">({t("optional")})</span>
                     </label>
                     <input
                       id={`pr-${item.id}`}
@@ -177,7 +179,7 @@ function StockForm({ items, today, onDone }: { items: ShoppingItem[]; today: str
       )}
       <div className="sticky bottom-0 -mx-5 flex justify-end border-t border-line bg-card px-5 pt-4 sm:-mx-7 sm:px-7">
         <Button pending={pending} disabled={included.length === 0} onClick={submit} className="w-full sm:w-auto">
-          Add {included.length} to inventory
+          {t("Add {n} to inventory", { n: included.length })}
         </Button>
       </div>
     </div>

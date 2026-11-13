@@ -10,8 +10,11 @@ import { RECIPES } from "@/lib/domain/recipes";
 import { evaluateRecipe, recommendRecipes } from "@/lib/domain/recommend";
 import { listProducts } from "@/lib/data/queries";
 import { requireViewer } from "@/lib/data/session";
+import { getT } from "@/lib/i18n/server";
 
-export const metadata: Metadata = { title: "Meals" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT())("Meals") };
+}
 
 const FILTERS = [
   { value: "", label: "Best matches" },
@@ -22,6 +25,7 @@ const FILTERS = [
 
 export default async function MealsPage({ searchParams }: PageProps<"/app/meals">) {
   const viewer = await requireViewer();
+  const t = await getT();
   const { filter } = await searchParams;
   const products = await listProducts(viewer);
 
@@ -41,7 +45,7 @@ export default async function MealsPage({ searchParams }: PageProps<"/app/meals"
         description="Ranked by what needs using first, then by how much you already have. Each suggestion says why it's here."
       />
 
-      <nav aria-label="Filter suggestions" className="-mx-4 mb-8 flex gap-1 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+      <nav aria-label={t("Filter suggestions")} className="-mx-4 mb-8 flex gap-1 overflow-x-auto px-4 sm:mx-0 sm:px-0">
         {FILTERS.map((f) => {
           const active = (filter ?? "") === f.value;
           return (
@@ -55,7 +59,7 @@ export default async function MealsPage({ searchParams }: PageProps<"/app/meals"
                 active ? "bg-ink text-card" : "text-ink-2 hover:bg-paper-deep",
               )}
             >
-              {f.label}
+              {t(f.label)}
             </Link>
           );
         })}
@@ -71,29 +75,29 @@ export default async function MealsPage({ searchParams }: PageProps<"/app/meals"
         <EmptyState
           icon={<CookingPot className="size-6" />}
           title={products.length ? "No recipes fit this filter" : "Add ingredients to get suggestions"}
-          action={!products.length ? <LinkButton href="/app/inventory">Go to inventory</LinkButton> : undefined}
+          action={!products.length ? <LinkButton href="/app/inventory">{t("Go to inventory")}</LinkButton> : undefined}
         >
-          {products.length
+          {t(products.length
             ? "Try another filter, or browse the full collection below."
-            : "Suggestions are built from what's in your kitchen, so they appear once you've added a few items."}
+            : "Suggestions are built from what's in your kitchen, so they appear once you've added a few items.")}
         </EmptyState>
       )}
 
       {others.length > 0 && (
         <section className="mt-16" aria-labelledby="collection-heading">
-          <p className="eyebrow mb-1.5">The collection</p>
+          <p className="eyebrow mb-1.5">{t("The collection")}</p>
           <h2 id="collection-heading" className="mb-2 text-[1.6rem] font-normal">
-            More recipes
+            {t("More recipes")}
           </h2>
-          <p className="mb-6 text-sm text-muted">These need a few more ingredients than you have right now.</p>
+          <p className="mb-6 text-sm text-muted">{t("These need a few more ingredients than you have right now.")}</p>
           <ul className="grid gap-x-8 divide-y divide-line border-y border-line sm:grid-cols-2 sm:divide-y-0">
             {others.map((m) => (
               <li key={m.recipe.slug} className="sm:border-b sm:border-line">
                 <Link href={`/app/meals/${m.recipe.slug}`} className="group flex items-center justify-between gap-4 py-4">
                   <span>
-                    <span className="block font-medium group-hover:text-forest-mid">{m.recipe.title}</span>
+                    <span className="block font-medium group-hover:text-forest-mid">{t(m.recipe.title)}</span>
                     <span className="text-[0.8125rem] text-muted">
-                      {m.recipe.minutes} min · {m.requiredCount - m.missing.length}/{m.requiredCount} in stock
+                      {t("{n} min", { n: m.recipe.minutes })} · {t("{a}/{b} in stock", { a: m.requiredCount - m.missing.length, b: m.requiredCount })}
                     </span>
                   </span>
                   <span className="text-muted transition-transform group-hover:translate-x-0.5" aria-hidden="true">

@@ -11,9 +11,11 @@ import { addDays } from "@/lib/domain/dates";
 import { recommendRecipes } from "@/lib/domain/recommend";
 import { getSaviState, hasDemoData, listInventorySnapshot } from "@/lib/data/queries";
 import { requireViewer } from "@/lib/data/session";
+import { getT } from "@/lib/i18n/server";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const viewer = await requireViewer();
+  const t = await getT();
   const [snapshot, demo, savi] = await Promise.all([listInventorySnapshot(viewer), hasDemoData(viewer), getSaviState(viewer)]);
 
   const soonLimit = addDays(viewer.today, USE_SOON_DAYS);
@@ -42,7 +44,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             href="#main"
             className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-card focus:px-4 focus:py-2"
           >
-            Skip to content
+            {t("Skip to content")}
           </a>
           <div className="min-h-dvh lg:grid lg:grid-cols-[264px_minmax(0,1fr)]">
             <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line bg-paper px-5 pb-5 pt-7 lg:flex">

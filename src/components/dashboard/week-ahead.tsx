@@ -1,28 +1,28 @@
 import Link from "next/link";
-import { addDays, formatShortDate } from "@/lib/domain/dates";
+import { addDays, formatShortDate, formatWeekday } from "@/lib/domain/dates";
+import { getLang, getT } from "@/lib/i18n/server";
 import { getExpiry } from "@/lib/domain/expiry";
 import type { Product } from "@/lib/data/queries";
 import { cx } from "@/lib/cx";
 import { StatusDot } from "@/components/ui/status";
 
-const weekday = new Intl.DateTimeFormat("en-GB", { weekday: "short", timeZone: "UTC" });
-
 /**
  * The signature view: the next seven days as columns, each listing what
  * reaches its date that day. Past-date items gather in a leading column.
  */
-export function WeekAhead({ products, today }: { products: Product[]; today: string }) {
+export async function WeekAhead({ products, today }: { products: Product[]; today: string }) {
+  const [t, lang] = [await getT(), await getLang()];
   const overdue = products.filter((p) => p.expires_on < today);
   const days = Array.from({ length: 7 }, (_, i) => {
     const date = addDays(today, i);
     return { date, items: products.filter((p) => p.expires_on === date) };
   });
   const columns = [
-    ...(overdue.length ? [{ key: "overdue", label: "Past date", sub: `${overdue.length} to check`, items: overdue, tone: "expired" as const }] : []),
+    ...(overdue.length ? [{ key: "overdue", label: t("Past date"), sub: t("{n} to check", { n: overdue.length }), items: overdue, tone: "expired" as const }] : []),
     ...days.map((d, i) => ({
       key: d.date,
-      label: i === 0 ? "Today" : i === 1 ? "Tomorrow" : weekday.format(new Date(`${d.date}T00:00:00Z`)),
-      sub: formatShortDate(d.date),
+      label: i === 0 ? t("Today") : i === 1 ? t("Tomorrow") : formatWeekday(d.date, lang, true).replace(/^./, (c) => c.toUpperCase()),
+      sub: formatShortDate(d.date, lang),
       items: d.items,
       tone: i <= 3 ? ("soon" as const) : ("fresh" as const),
     })),
@@ -46,11 +46,11 @@ export function WeekAhead({ products, today }: { products: Product[]; today: str
               {col.items.slice(0, 4).map((p) => (
                 <li key={p.id} className="flex items-center gap-1.5 text-[0.8125rem] leading-tight">
                   <StatusDot status={getExpiry(p.expires_on, today).status} className="shrink-0" />
-                  <span className="truncate">{p.name}</span>
+                  <span className="truncate">{t(p.name)}</span>
                 </li>
               ))}
-              {col.items.length > 4 && <li className="text-xs text-muted">+{col.items.length - 4} more</li>}
-              {col.items.length === 0 && <li className="text-xs text-faint">Nothing due</li>}
+              {col.items.length > 4 && <li className="text-xs text-muted">{t("+{n} more", { n: col.items.length - 4 })}</li>}
+              {col.items.length === 0 && <li className="text-xs text-faint">{t("Nothing due")}</li>}
             </ul>
           </li>
         ))}
@@ -58,9 +58,9 @@ export function WeekAhead({ products, today }: { products: Product[]; today: str
       <p className="mt-3 text-sm text-muted">
         {later > 0 ? (
           <>
-            {later} more {later === 1 ? "item has" : "items have"} dates beyond this week.{" "}
+            {t(`${later} more ${later === 1 ? "item has" : "items have"} dates beyond this week.`)}{" "}
             <Link href="/app/inventory" className="font-medium text-forest-mid underline-offset-4 hover:underline">
-              See inventory
+              {t("See inventory")}
             </Link>
           </>
         ) : null}

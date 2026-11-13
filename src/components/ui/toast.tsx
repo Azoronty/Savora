@@ -3,6 +3,7 @@
 import { CircleAlert, CircleCheck, X } from "lucide-react";
 import { createContext, useCallback, useContext, useMemo, useState, useTransition, type ReactNode } from "react";
 import type { ActionResult } from "@/lib/actions/result";
+import { useT } from "@/components/i18n/lang-provider";
 
 type Toast = { id: number; tone: "success" | "error"; message: string };
 type ToastApi = { notify: (message: string, tone?: Toast["tone"]) => void };
@@ -12,15 +13,16 @@ let nextId = 1;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const t = useT();
 
   const dismiss = useCallback((id: number) => setToasts((all) => all.filter((t) => t.id !== id)), []);
   const notify = useCallback(
     (message: string, tone: Toast["tone"] = "success") => {
       const id = nextId++;
-      setToasts((all) => [...all.slice(-2), { id, tone, message }]);
+      setToasts((all) => [...all.slice(-2), { id, tone, message: t(message) }]);
       setTimeout(() => dismiss(id), tone === "error" ? 6000 : 3500);
     },
-    [dismiss],
+    [dismiss, t],
   );
   const api = useMemo(() => ({ notify }), [notify]);
 
@@ -47,7 +49,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               type="button"
               onClick={() => dismiss(toast.id)}
               className="-m-1 rounded p-1 text-card/70 hover:text-card"
-              aria-label="Dismiss"
+              aria-label={t("Dismiss")}
             >
               <X className="size-4" />
             </button>

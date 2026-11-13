@@ -13,6 +13,7 @@ import { Sheet } from "@/components/ui/sheet";
 import { useAction } from "@/components/ui/toast";
 import { useProductSheet } from "@/components/app/product-sheet";
 import { useSavi } from "@/components/savi/savi-companion";
+import { useT } from "@/components/i18n/lang-provider";
 import { daysBetween } from "@/lib/domain/dates";
 
 /** A use within the use-soon window counts as a rescue (mirrors the database rule). */
@@ -29,6 +30,7 @@ export function ProductActions({ product, today, compact = false }: { product: P
   const { openEdit } = useProductSheet();
   const menuRef = useRef<HTMLDivElement>(null);
   const { run, pending } = useAction();
+  const t = useT();
   const savi = useSavi();
 
   useEffect(() => {
@@ -62,16 +64,16 @@ export function ProductActions({ product, today, compact = false }: { product: P
               const r = await run(() => consumeProduct(product.id, Number(product.quantity)));
               if (r.ok) savi({ type: "product_used", name: product.name, rescued: isRescue(product.expires_on, today) });
             }}
-            aria-label={`Mark all ${product.name} as used`}
+            aria-label={t("Mark all {name} as used", { name: t(product.name) })}
           >
-            <Check className="size-4" aria-hidden="true" /> Used
+            <Check className="size-4" aria-hidden="true" /> {t("Used")}
           </Button>
         </span>
       )}
       <div ref={menuRef} className="relative">
         <button
           type="button"
-          aria-label={`More actions for ${product.name}`}
+          aria-label={t("More actions for {name}", { name: t(product.name) })}
           aria-haspopup="menu"
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((o) => !o)}
@@ -85,17 +87,17 @@ export function ProductActions({ product, today, compact = false }: { product: P
             className="absolute right-0 top-11 z-20 w-56 overflow-hidden rounded-lg border border-line bg-card py-1.5 shadow-lift animate-fade"
           >
             <MenuItem icon={<Check />} onClick={() => pick("use")}>
-              Mark as used…
+              {t("Mark as used…")}
             </MenuItem>
             <MenuItem icon={<Recycle />} onClick={() => pick("discard")}>
-              Throw away…
+              {t("Throw away…")}
             </MenuItem>
             <MenuItem icon={<Pencil />} onClick={() => pick("edit")}>
-              Edit details
+              {t("Edit details")}
             </MenuItem>
             <div className="my-1.5 border-t border-line" />
             <MenuItem icon={<Trash />} danger onClick={() => pick("delete")}>
-              Delete
+              {t("Delete")}
             </MenuItem>
           </div>
         )}
@@ -111,7 +113,7 @@ export function ProductActions({ product, today, compact = false }: { product: P
         footer={
           <>
             <Button variant="secondary" onClick={() => setMode(null)}>
-              Cancel
+              {t("Cancel")}
             </Button>
             <Button
               variant="danger"
@@ -121,13 +123,13 @@ export function ProductActions({ product, today, compact = false }: { product: P
                 if (r.ok) setMode(null);
               }}
             >
-              Delete {product.name}
+              {t("Delete")} {t(product.name)}
             </Button>
           </>
         }
       >
         <p className="text-[0.9375rem] text-ink-2">
-          <strong className="font-medium text-ink">{product.name}</strong> · {formatQuantity(Number(product.quantity), product.unit)}
+          <strong className="font-medium text-ink">{t(product.name)}</strong> · {t(formatQuantity(Number(product.quantity), product.unit))}
         </p>
       </Sheet>
     </div>
@@ -174,13 +176,14 @@ function useAmount(product: Product) {
 }
 
 function AmountPicker({ product, state, idPrefix }: { product: Product; state: ReturnType<typeof useAmount>; idPrefix: string }) {
-  const error = !state.all && !state.valid ? `Enter an amount up to ${formatQuantity(state.total, product.unit)}` : undefined;
+  const t = useT();
+  const error = !state.all && !state.valid ? t("Enter an amount up to {max}", { max: t(formatQuantity(state.total, product.unit)) }) : undefined;
   return (
     <div className="flex flex-col gap-3">
-      <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="How much">
+      <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t("How much")}>
         {[
-          { all: true, label: "All of it", sub: formatQuantity(state.total, product.unit) },
-          { all: false, label: "Some of it", sub: "Enter an amount" },
+          { all: true, label: t("All of it"), sub: t(formatQuantity(state.total, product.unit)) },
+          { all: false, label: t("Some of it"), sub: t("Enter an amount") },
         ].map((opt) => (
           <button
             key={opt.label}
@@ -199,7 +202,7 @@ function AmountPicker({ product, state, idPrefix }: { product: Product; state: R
         ))}
       </div>
       {!state.all && (
-        <Field id={`${idPrefix}-amount`} label={`Amount (${UNIT_LABEL[product.unit]})`} error={error}>
+        <Field id={`${idPrefix}-amount`} label={t("Amount ({unit})", { unit: t(UNIT_LABEL[product.unit]) })} error={error}>
           <Input
             id={`${idPrefix}-amount`}
             inputMode="decimal"
@@ -219,6 +222,7 @@ function AmountPicker({ product, state, idPrefix }: { product: Product; state: R
 function UseSheet({ product, today, open, onClose }: { product: Product; today: string; open: boolean; onClose: () => void }) {
   const amount = useAmount(product);
   const { run, pending } = useAction();
+  const t = useT();
   const savi = useSavi();
   const id = useId();
   return (
@@ -226,11 +230,11 @@ function UseSheet({ product, today, open, onClose }: { product: Product; today: 
       open={open}
       onClose={onClose}
       title="Mark as used"
-      description={`${product.name} · ${formatQuantity(amount.total, product.unit)} in stock`}
+      description={t("{name} · {qty} in stock", { name: t(product.name), qty: t(formatQuantity(amount.total, product.unit)) })}
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button
             pending={pending}
@@ -243,7 +247,7 @@ function UseSheet({ product, today, open, onClose }: { product: Product; today: 
               }
             }}
           >
-            Mark as used
+            {t("Mark as used")}
           </Button>
         </>
       }
@@ -258,6 +262,7 @@ function DiscardSheet({ product, today, open, onClose }: { product: Product; tod
   const [reason, setReason] = useState<WasteReason>(product.expires_on < today ? "expired" : "spoiled");
   const [date, setDate] = useState(today);
   const { run, pending } = useAction();
+  const t = useT();
   const savi = useSavi();
   const id = useId();
   const cost =
@@ -272,7 +277,7 @@ function DiscardSheet({ product, today, open, onClose }: { product: Product; tod
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button
             pending={pending}
@@ -287,19 +292,19 @@ function DiscardSheet({ product, today, open, onClose }: { product: Product; tod
               }
             }}
           >
-            Log &amp; remove
+            {t("Log & remove")}
           </Button>
         </>
       }
     >
       <div className="flex flex-col gap-6">
         <p className="text-[0.9375rem]">
-          <strong className="font-medium">{product.name}</strong>
-          <span className="text-muted"> · {formatQuantity(amount.total, product.unit)}</span>
+          <strong className="font-medium">{t(product.name)}</strong>
+          <span className="text-muted"> · {t(formatQuantity(amount.total, product.unit))}</span>
         </p>
         <AmountPicker product={product} state={amount} idPrefix={id} />
         <fieldset>
-          <legend className="mb-2 text-sm font-medium text-ink-2">Why is it going?</legend>
+          <legend className="mb-2 text-sm font-medium text-ink-2">{t("Why is it going?")}</legend>
           <div className="flex flex-wrap gap-2">
             {WASTE_REASONS.map((r) => (
               <label
@@ -310,7 +315,7 @@ function DiscardSheet({ product, today, open, onClose }: { product: Product; tod
                 )}
               >
                 <input type="radio" name={`${id}-reason`} value={r} checked={reason === r} onChange={() => setReason(r)} className="sr-only" />
-                {WASTE_REASON_LABEL[r]}
+                {t(WASTE_REASON_LABEL[r])}
               </label>
             ))}
           </div>
@@ -320,7 +325,7 @@ function DiscardSheet({ product, today, open, onClose }: { product: Product; tod
         </Field>
         {cost !== null && (
           <p className="rounded-lg bg-paper-deep/70 px-4 py-3 text-sm text-ink-2">
-            Logged value: <strong className="font-medium tabular text-ink">{formatMoney(cost)}</strong>, based on the price you entered.
+            {t("Logged value:")} <strong className="font-medium tabular text-ink">{formatMoney(cost)}</strong>{t(", based on the price you entered.")}
           </p>
         )}
       </div>

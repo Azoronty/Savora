@@ -1,5 +1,6 @@
 import { STATUS_LABEL, type ExpiryInfo, type ExpiryStatus } from "@/lib/domain/expiry";
 import { cx } from "@/lib/cx";
+import { Tx } from "@/components/i18n/lang-provider";
 
 const tone: Record<ExpiryStatus, string> = {
   fresh: "bg-fresh-soft text-fresh",
@@ -24,7 +25,7 @@ export function StatusPill({ status, className }: { status: ExpiryStatus; classN
       )}
     >
       <span className={cx("size-1.5 rounded-full", dot[status])} aria-hidden="true" />
-      {STATUS_LABEL[status]}
+      <Tx>{STATUS_LABEL[status]}</Tx>
     </span>
   );
 }

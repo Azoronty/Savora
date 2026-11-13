@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { planWeek, reminderText } from "@/lib/domain/plan";
+import { getT } from "@/lib/i18n/server";
 import { pushConfigured, sendPush } from "@/lib/push";
 import { actionContext } from "./context";
 import { dbError, notSignedIn, ok, type ActionResult } from "./result";
@@ -61,7 +62,7 @@ export async function sendTestReminder(): Promise<ActionResult<{ delivered: numb
   if (products.error) return dbError(products.error);
   if (subs.data.length === 0) return { ok: false, error: "Turn on reminders on this device first." };
 
-  const text = reminderText(planWeek(products.data, ctx.viewer.today));
+  const text = reminderText(planWeek(products.data, ctx.viewer.today), await getT());
   const results = await sendPush(subs.data, { ...text, tag: "savora-test" });
   const gone = results.filter((r) => r.gone).map((r) => r.endpoint);
   if (gone.length) await ctx.supabase.from("push_subscriptions").delete().in("endpoint", gone);

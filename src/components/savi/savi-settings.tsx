@@ -4,12 +4,14 @@ import { useState } from "react";
 import { setSaviMode } from "@/lib/actions/savi";
 import { Segmented } from "@/components/ui/field";
 import { useAction } from "@/components/ui/toast";
+import { useT } from "@/components/i18n/lang-provider";
 
 type Mode = "full" | "quiet" | "hidden";
 
 export function SaviSettings({ mode }: { mode: Mode }) {
   const [value, setValue] = useState<Mode>(mode);
   const { run } = useAction();
+  const t = useT();
   return (
     <div className="max-w-md">
       <Segmented
@@ -29,8 +31,7 @@ export function SaviSettings({ mode }: { mode: Mode }) {
         }}
       />
       <p className="mt-2 text-[0.8125rem] text-muted">
-        Quiet keeps Savi around without speech bubbles. Hidden removes Savi from every page; XP and missions still count. Savi also follows
-        your system’s reduced-motion setting.
+        {t("Quiet keeps Savi around without speech bubbles. Hidden removes Savi from every page; XP and missions still count. Savi also follows your system’s reduced-motion setting.")}
       </p>
     </div>
   );

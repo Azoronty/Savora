@@ -35,7 +35,7 @@ const NUMBER_WORDS: Record<string, number> = {
 };
 
 /** Display names for Russian input, in the nominative ("полкило фарша" is saved as «Фарш»). */
-const RU_NAME: Record<string, string> = {
+export const RU_NAME: Record<string, string> = {
   tomato: "Помидоры", spinach: "Шпинат", lettuce: "Салат", cucumber: "Огурцы", "bell pepper": "Болгарский перец",
   onion: "Лук", "spring onion": "Зелёный лук", garlic: "Чеснок", carrot: "Морковь", potato: "Картофель",
   "sweet potato": "Батат", zucchini: "Кабачки", broccoli: "Брокколи", mushroom: "Грибы", avocado: "Авокадо",

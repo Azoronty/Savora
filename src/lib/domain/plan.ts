@@ -155,23 +155,23 @@ export function planWeek(items: PlanItem[], today: IsoDate, { days = 7, maxMissi
   };
 }
 
-/** One-line morning summary used by push reminders. */
-export function reminderText(plan: RescuePlan): { title: string; body: string } {
+/** One-line morning summary used by push reminders. `t` translates it (identity = English). */
+export function reminderText(plan: RescuePlan, t: (text: string, vars?: Record<string, string | number>) => string = (s, v) => s.replace(/\{(\w+)\}/g, (_, k) => String(v?.[k] ?? ""))): { title: string; body: string } {
   const today = plan.days[0];
   const urgent = today ? plan.atRisk.filter((i) => daysBetween(today.date, i.expires_on) <= 1) : [];
-  const title = urgent.length
+  const title = t(urgent.length
     ? urgent.length === 1
       ? "1 item reaches its date by tomorrow"
       : `${urgent.length} items reach their date by tomorrow`
     : plan.atRisk.length
       ? `${plan.atRisk.length} ${plan.atRisk.length === 1 ? "item needs" : "items need"} using this week`
-      : "Your kitchen is on track";
-  const names = urgent.slice(0, 3).map((i) => i.name);
+      : "Your kitchen is on track");
+  const names = urgent.slice(0, 3).map((i) => t(i.name));
   const parts: string[] = [];
-  if (names.length) parts.push(`${joinNames(names)}.`);
+  if (names.length) parts.push(`${joinNames(names).replace(/ and ([^,]+)$/, `${t(" and ")}$1`)}.`);
   const meal = today?.meals[0];
-  if (meal) parts.push(`Today's rescue meal: ${meal.recipe.title} (${meal.recipe.minutes} min).`);
-  else if (plan.rescueSteps[0]) parts.push(`${plan.rescueSteps[0].item.name}: ${plan.rescueSteps[0].text}`);
-  if (!parts.length) parts.push("Nothing needs using soon. Open Savora to plan the week.");
+  if (meal) parts.push(t("Today's rescue meal: {title} ({min} min).", { title: t(meal.recipe.title), min: meal.recipe.minutes }));
+  else if (plan.rescueSteps[0]) parts.push(`${t(plan.rescueSteps[0].item.name)}: ${t(plan.rescueSteps[0].text)}`);
+  if (!parts.length) parts.push(t("Nothing needs using soon. Open Savora to plan the week."));
   return { title, body: parts.join(" ") };
 }

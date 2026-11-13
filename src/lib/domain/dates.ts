@@ -58,20 +58,26 @@ export function todayIn(timeZone: string, now: Date = new Date()): IsoDate {
   }).format(now);
 }
 
-const shortFormat = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
-const longFormat = new Intl.DateTimeFormat("en-GB", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-  timeZone: "UTC",
+const formats = (locale: string) => ({
+  short: new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" }),
+  long: new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }),
+  weekday: new Intl.DateTimeFormat(locale, { weekday: "long", timeZone: "UTC" }),
+  weekdayShort: new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }),
 });
+const FORMATS = { en: formats("en-GB"), ru: formats("ru-RU") };
+type DateLang = keyof typeof FORMATS;
+const at = (iso: IsoDate) => new Date(toDayNumber(iso) * MS_PER_DAY);
 
-export function formatShortDate(iso: IsoDate): string {
-  return shortFormat.format(new Date(toDayNumber(iso) * MS_PER_DAY));
+export function formatShortDate(iso: IsoDate, lang: DateLang = "en"): string {
+  return FORMATS[lang].short.format(at(iso)).replace(".", "");
 }
 
-export function formatLongDate(iso: IsoDate): string {
-  return longFormat.format(new Date(toDayNumber(iso) * MS_PER_DAY));
+export function formatLongDate(iso: IsoDate, lang: DateLang = "en"): string {
+  return FORMATS[lang].long.format(at(iso));
+}
+
+export function formatWeekday(iso: IsoDate, lang: DateLang = "en", short = false): string {
+  return FORMATS[lang][short ? "weekdayShort" : "weekday"].format(at(iso));
 }
 
 /** Monday of the ISO week containing `iso`. */

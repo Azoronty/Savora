@@ -1,13 +1,16 @@
 import { Logo } from "@/components/brand/logo";
+import { LangSwitch } from "@/components/i18n/lang-provider";
+import { getT } from "@/lib/i18n/server";
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+export default async function AuthLayout({ children }: { children: React.ReactNode }) {
+  const t = await getT();
   return (
     <div className="grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
       <aside className="grain relative hidden flex-col justify-between overflow-hidden bg-forest p-12 text-card lg:flex">
         <Logo tone="paper" />
         <div className="relative max-w-md">
           <p className="font-display text-[2.6rem] leading-[1.08] text-card">
-            The food you already have is the easiest food to save.
+            {t("The food you already have is the easiest food to save.")}
           </p>
           <ul className="mt-10 flex flex-col gap-4 text-[0.9375rem] text-card/80">
             {[
@@ -17,19 +20,22 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             ].map((line) => (
               <li key={line} className="flex gap-3">
                 <span className="mt-2.5 h-px w-5 shrink-0 bg-saffron" aria-hidden="true" />
-                {line}
+                {t(line)}
               </li>
             ))}
           </ul>
         </div>
-        <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-card/50">Household food, managed with care</p>
+        <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-card/50">{t("Household food, managed with care")}</p>
         <svg className="pointer-events-none absolute -bottom-24 -right-24 size-[26rem] text-card/[0.05]" viewBox="0 0 32 32" aria-hidden="true">
           <path d="M9.5 22.5C9.5 14.5 14.5 9.5 22.5 9.5c0 8-5 13-13 13Z" fill="currentColor" />
         </svg>
       </aside>
       <main className="flex flex-col px-5 py-8 sm:px-10">
-        <div className="lg:hidden">
-          <Logo />
+        <div className="flex items-center justify-between gap-4">
+          <span className="lg:hidden">
+            <Logo />
+          </span>
+          <LangSwitch className="ml-auto" />
         </div>
         <div className="flex flex-1 items-center justify-center py-10">{children}</div>
       </main>

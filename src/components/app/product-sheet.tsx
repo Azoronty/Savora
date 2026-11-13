@@ -6,6 +6,7 @@ import { Sheet } from "@/components/ui/sheet";
 import { ProductForm, type ProductPrefill } from "@/components/inventory/product-form";
 import { QuickAddForm } from "@/components/inventory/quick-add-form";
 import { cx } from "@/lib/cx";
+import { useT } from "@/components/i18n/lang-provider";
 
 type SheetState = { mode: "new"; prefill?: ProductPrefill; key: number } | { mode: "edit"; product: Product; key: number } | null;
 type Api = { openNew: (prefill?: ProductPrefill) => void; openEdit: (product: Product) => void };
@@ -27,6 +28,7 @@ export function ProductSheetProvider({ today, children }: { today: string; child
     [],
   );
 
+  const t = useT();
   return (
     <ProductSheetContext value={api}>
       {children}
@@ -41,7 +43,7 @@ export function ProductSheetProvider({ today, children }: { today: string; child
         }
       >
         {state?.mode === "new" && !state.prefill && (
-          <div className="mb-5 grid grid-cols-2 rounded-full border border-line bg-paper-deep p-1 text-sm" role="group" aria-label="How to add">
+          <div className="mb-5 grid grid-cols-2 rounded-full border border-line bg-paper-deep p-1 text-sm" role="group" aria-label={t("How to add")}>
             {[
               [false, "One item"],
               [true, "Several · voice"],
@@ -53,7 +55,7 @@ export function ProductSheetProvider({ today, children }: { today: string; child
                 onClick={() => setMany(value as boolean)}
                 className={cx("h-9 rounded-full font-medium transition-colors", many === value ? "bg-card text-ink shadow-soft" : "text-muted hover:text-ink")}
               >
-                {label as string}
+                {t(label as string)}
               </button>
             ))}
           </div>

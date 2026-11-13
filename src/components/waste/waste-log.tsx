@@ -23,14 +23,16 @@ import { Field, Input, Select, describedBy } from "@/components/ui/field";
 import { Sheet } from "@/components/ui/sheet";
 import { useAction } from "@/components/ui/toast";
 import { CategoryIcon } from "@/components/ui/category-icon";
+import { useLang, useT } from "@/components/i18n/lang-provider";
 import { SampleTag } from "@/components/inventory/product-row";
 
 export function LogWasteButton({ today }: { today: string }) {
   const [open, setOpen] = useState(false);
+  const t = useT();
   return (
     <>
       <Button variant="secondary" onClick={() => setOpen(true)}>
-        <Plus className="size-4" aria-hidden="true" /> Log thrown-away food
+        <Plus className="size-4" aria-hidden="true" /> {t("Log thrown-away food")}
       </Button>
       <Sheet open={open} onClose={() => setOpen(false)} title="Log thrown-away food" description="For things that weren't tracked in your inventory. For tracked items, use “Throw away” on the item itself.">
         {open && <LogWasteForm today={today} onDone={() => setOpen(false)} />}
@@ -51,11 +53,12 @@ function LogWasteForm({ today, onDone }: { today: string; onDone: () => void }) 
   const [cost, setCost] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { run, pending } = useAction();
+  const t = useT();
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const cents = parseMoneyToCents(cost);
-    if (Number.isNaN(cents)) return setErrors({ cost_cents: "Enter an amount like 2.50" });
+    if (Number.isNaN(cents)) return setErrors({ cost_cents: t("Enter an amount like 2.50") });
     const r = await run(() =>
       logWaste({ product_name: name, quantity, unit, category, reason, discarded_on: date, cost_cents: cents }),
     );
@@ -71,7 +74,7 @@ function LogWasteForm({ today, onDone }: { today: string; onDone: () => void }) 
           value={name}
           autoFocus
           maxLength={80}
-          placeholder="e.g. Half a bag of salad"
+          placeholder={t("e.g. Half a bag of salad")}
           aria-invalid={Boolean(errors.product_name) || undefined}
           aria-describedby={describedBy(`${uid}-name`, errors.product_name)}
           onChange={(e) => {
@@ -89,7 +92,7 @@ function LogWasteForm({ today, onDone }: { today: string; onDone: () => void }) 
           <Select id={`${uid}-unit`} value={unit} onChange={(e) => setUnit(e.target.value as Unit)}>
             {UNITS.map((u) => (
               <option key={u} value={u}>
-                {UNIT_LABEL[u]}
+                {t(UNIT_LABEL[u])}
               </option>
             ))}
           </Select>
@@ -106,7 +109,7 @@ function LogWasteForm({ today, onDone }: { today: string; onDone: () => void }) 
         >
           {CATEGORIES.map((c) => (
             <option key={c} value={c}>
-              {CATEGORY_LABEL[c]}
+              {t(CATEGORY_LABEL[c])}
             </option>
           ))}
         </Select>
@@ -115,7 +118,7 @@ function LogWasteForm({ today, onDone }: { today: string; onDone: () => void }) 
         <Select id={`${uid}-reason`} value={reason} onChange={(e) => setReason(e.target.value as WasteReason)}>
           {WASTE_REASONS.map((r) => (
             <option key={r} value={r}>
-              {WASTE_REASON_LABEL[r]}
+              {t(WASTE_REASON_LABEL[r])}
             </option>
           ))}
         </Select>
@@ -129,7 +132,7 @@ function LogWasteForm({ today, onDone }: { today: string; onDone: () => void }) 
         </Field>
       </div>
       <Button type="submit" pending={pending} className="mt-1">
-        Add to waste log
+        {t("Add to waste log")}
       </Button>
     </form>
   );
@@ -137,6 +140,8 @@ function LogWasteForm({ today, onDone }: { today: string; onDone: () => void }) 
 
 export function WasteLogList({ records }: { records: WasteRecord[] }) {
   const { run } = useAction();
+  const t = useT();
+  const lang = useLang();
   return (
     <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-card">
       {records.map((r) => (
@@ -144,21 +149,21 @@ export function WasteLogList({ records }: { records: WasteRecord[] }) {
           <CategoryIcon category={r.category} name={r.product_name} />
           <div className="min-w-0 flex-1">
             <p className="flex items-center gap-2">
-              <span className="truncate font-medium">{r.product_name}</span>
+              <span className="truncate font-medium">{t(r.product_name)}</span>
               {r.is_demo && <SampleTag />}
             </p>
             <p className="text-[0.8125rem] text-muted">
-              {formatQuantity(Number(r.quantity), r.unit)} · {WASTE_REASON_LABEL[r.reason]}
+              {t(formatQuantity(Number(r.quantity), r.unit))} · {t(WASTE_REASON_LABEL[r.reason])}
             </p>
           </div>
           <div className="text-right">
-            <p className="font-mono text-[0.8125rem] tabular">{formatShortDate(r.discarded_on)}</p>
-            <p className="text-[0.8125rem] text-muted tabular">{r.cost_cents !== null ? formatMoney(r.cost_cents) : "No price"}</p>
+            <p className="font-mono text-[0.8125rem] tabular">{formatShortDate(r.discarded_on, lang)}</p>
+            <p className="text-[0.8125rem] text-muted tabular">{r.cost_cents !== null ? formatMoney(r.cost_cents) : t("No price")}</p>
           </div>
           <button
             type="button"
             onClick={() => run(() => deleteWasteRecord(r.id))}
-            aria-label={`Delete record for ${r.product_name}`}
+            aria-label={t("Delete record for {name}", { name: t(r.product_name) })}
             className="-mr-2 inline-flex size-9 items-center justify-center rounded-md text-muted hover:bg-paper-deep hover:text-ink"
           >
             <X className="size-4" />

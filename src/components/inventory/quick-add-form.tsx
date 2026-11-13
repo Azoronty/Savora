@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { controlClass } from "@/components/ui/field";
 import { useAction } from "@/components/ui/toast";
 import { useSavi } from "@/components/savi/savi-companion";
+import { useLang, useT } from "@/components/i18n/lang-provider";
 
 // Minimal typing for the Web Speech API (not in TypeScript's DOM lib).
 type Recognition = {
@@ -35,12 +36,14 @@ const fmtQty = (q: number) => (Number.isInteger(q) ? String(q) : q.toFixed(2).re
 
 export function QuickAddForm({ today, onDone }: { today: string; onDone: () => void }) {
   const { run, pending } = useAction();
+  const t = useT();
+  const uiLang = useLang();
   const savi = useSavi();
   const [text, setText] = useState("");
   const [dates, setDates] = useState<Record<string, string>>({});
   const [removed, setRemoved] = useState<Set<string>>(new Set());
   const [usuals, setUsuals] = useState<string[]>([]);
-  const [lang, setLang] = useState<"en-US" | "ru-RU">("ru-RU");
+  const [lang, setLang] = useState<"en-US" | "ru-RU">(uiLang === "en" ? "en-US" : "ru-RU");
   const [heard, setHeard] = useState("");
   const [speech, setSpeech] = useState<"unsupported" | "idle" | "listening">("unsupported");
   const [voiceError, setVoiceError] = useState<string | null>(null);
@@ -49,8 +52,6 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- browser capabilities are only known after mount
     if (speechCtor()) setSpeech("idle");
-    // Russian by default (the audience); English only for English-language browsers.
-    if (navigator.language.toLowerCase().startsWith("en")) setLang("en-US");
     getUsualItems().then((r) => r.ok && setUsuals(r.data));
     return () => recognition.current?.stop();
   }, []);
@@ -77,7 +78,7 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
       if (said.trim()) setText((t) => (t.trim() ? `${t.trim()}, ${said.trim()}` : said.trim()));
     };
     r.onerror = (e) =>
-      setVoiceError(
+      setVoiceError(t(
         {
           "not-allowed": "Microphone access is blocked. Allow it in the site settings (icon left of the address), then reload.",
           "service-not-allowed": "Microphone access is blocked. Allow it in the site settings (icon left of the address), then reload.",
@@ -86,7 +87,7 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
           "no-speech": "Didn't hear anything. Tap the mic and speak.",
           "language-not-supported": "This browser can't recognise this language. Switch EN / RU.",
         }[e.error] ?? "Didn't catch that. Try again or type the list.",
-      );
+      ));
     const startedAt = Date.now();
     let gotResult = false;
     const onResult = r.onresult;
@@ -99,7 +100,7 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
       setHeard("");
       // Ending within a second with nothing heard means the browser has no working speech service.
       if (!gotResult && Date.now() - startedAt < 1000) {
-        setVoiceError((err) => err ?? "Voice input stopped at once: this browser has no speech service. Open Savora in Chrome or Edge, or type the list.");
+        setVoiceError((err) => err ?? t("Voice input stopped at once: this browser has no speech service. Open Savora in Chrome or Edge, or type the list."));
       }
     };
     recognition.current = r;
@@ -134,7 +135,7 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
     <div className="flex flex-col gap-4">
       <div>
         <label htmlFor="quick-list" className="mb-1.5 block text-sm font-medium">
-          Say or type everything you bought
+          {t("Say or type everything you bought")}
         </label>
         <div className="relative">
           <textarea
@@ -142,7 +143,7 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={3}
-            placeholder="milk 2 l, eggs 10, spinach, 500 g chicken"
+            placeholder={t("milk 2 l, eggs 10, spinach, 500 g chicken")}
             className={cx(controlClass, "!h-auto min-h-24 resize-y py-2.5 pr-14")}
             aria-describedby="quick-hint"
           />
@@ -151,7 +152,7 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
               type="button"
               onClick={listen}
               aria-pressed={speech === "listening"}
-              aria-label={speech === "listening" ? "Stop listening" : "Speak your list"}
+              aria-label={t(speech === "listening" ? "Stop listening" : "Speak your list")}
               className={cx(
                 "absolute right-2 top-2 inline-flex size-10 items-center justify-center rounded-full transition-colors",
                 speech === "listening" ? "animate-pulse bg-expired text-card" : "bg-forest text-card hover:bg-forest-deep",
@@ -162,9 +163,9 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
           )}
         </div>
         <div id="quick-hint" className="mt-1.5 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
-          <span>{speech === "listening" ? "Listening… e.g. «молоко 2 литра, яйца 10 штук, шпинат». Pauses are fine." : "Commas or “and” separate items. Russian works too: «молоко 2 л, яйца 10»."}</span>
+          <span>{t(speech === "listening" ? "Listening… e.g. «молоко 2 литра, яйца 10 штук, шпинат». Pauses are fine." : "Commas or “and” separate items. Russian works too: «молоко 2 л, яйца 10».")}</span>
           {speech !== "unsupported" && (
-            <span className="inline-flex overflow-hidden rounded-full border border-line" role="group" aria-label="Voice language">
+            <span className="inline-flex overflow-hidden rounded-full border border-line" role="group" aria-label={t("Voice language")}>
               {(["en-US", "ru-RU"] as const).map((l) => (
                 <button key={l} type="button" onClick={() => setLang(l)} aria-pressed={lang === l} className={cx("px-2 py-0.5", lang === l ? "bg-forest text-card" : "hover:bg-paper-deep")}>
                   {l === "en-US" ? "EN" : "RU"}
@@ -174,7 +175,7 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
           )}
         </div>
         {speech === "unsupported" && (
-          <p className="mt-1 text-xs text-muted">Voice input works in Chrome, Edge and Safari (not in Yandex Browser, Opera or Brave). Here, type the list.</p>
+          <p className="mt-1 text-xs text-muted">{t("Voice input works in Chrome, Edge and Safari (not in Yandex Browser, Opera or Brave). Here, type the list.")}</p>
         )}
         {heard && <p className="mt-1 text-sm italic text-muted" aria-live="polite">{heard}…</p>}
         {voiceError && <p className="mt-1 text-xs text-expired">{voiceError}</p>}
@@ -182,7 +183,7 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
 
       {usuals.length > 0 && (
         <div>
-          <p className="mb-1.5 text-xs font-medium uppercase tracking-[0.12em] text-muted">Your usuals</p>
+          <p className="mb-1.5 text-xs font-medium uppercase tracking-[0.12em] text-muted">{t("Your usuals")}</p>
           <div className="flex flex-wrap gap-2">
             {usuals.map((u) => (
               <button
@@ -191,7 +192,7 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
                 onClick={() => setText((t) => (t.trim() ? `${t.trim()}, ${u}` : u))}
                 className="h-8 rounded-full border border-line bg-card px-3 text-sm hover:border-forest-mid"
               >
-                + {u}
+                + {t(u)}
               </button>
             ))}
           </div>
@@ -199,21 +200,21 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
       )}
 
       {items.length > 0 && (
-        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-card" aria-label="Items to add">
+        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-card" aria-label={t("Items to add")}>
           {items.map((item) => {
             const off = removed.has(item.id);
             return (
               <li key={item.id} className={cx("flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2.5 text-sm", off && "opacity-40")}>
                 <div className="min-w-0 flex-1">
-                  <p className={cx("truncate font-medium", off && "line-through")}>{item.name}</p>
+                  <p className={cx("truncate font-medium", off && "line-through")}>{t(item.name)}</p>
                   <p className="text-xs text-muted">
-                    {fmtQty(item.quantity)} {UNIT_LABEL[item.unit]} · {STORAGE_LABEL[item.storage].replace("Refrigerator", "Fridge")}
-                    {!item.recognised && <span className="text-soon"> · check the date</span>}
+                    {fmtQty(item.quantity)} {t(UNIT_LABEL[item.unit])} · {t(STORAGE_LABEL[item.storage].replace("Refrigerator", "Fridge"))}
+                    {!item.recognised && <span className="text-soon"> · {t("check the date")}</span>}
                   </p>
                 </div>
                 <input
                   type="date"
-                  aria-label={`Date for ${item.name}`}
+                  aria-label={t("Date for {name}", { name: t(item.name) })}
                   value={dates[item.id] ?? item.expires_on}
                   min={today}
                   disabled={off}
@@ -223,7 +224,7 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
                 <button
                   type="button"
                   onClick={() => setRemoved((s) => { const n = new Set(s); if (n.has(item.id)) n.delete(item.id); else n.add(item.id); return n; })}
-                  aria-label={off ? `Keep ${item.name}` : `Remove ${item.name}`}
+                  aria-label={t(off ? "Keep {name}" : "Remove {name}", { name: t(item.name) })}
                   className="inline-flex size-8 items-center justify-center rounded-full text-muted hover:bg-paper-deep hover:text-ink"
                 >
                   <X className="size-4" aria-hidden="true" />
@@ -233,10 +234,10 @@ export function QuickAddForm({ today, onDone }: { today: string; onDone: () => v
           })}
         </ul>
       )}
-      {items.length > 0 && <p className="text-xs text-muted">Dates are typical shelf lives. Use the date on the package when it differs.</p>}
+      {items.length > 0 && <p className="text-xs text-muted">{t("Dates are typical shelf lives. Use the date on the package when it differs.")}</p>}
 
       <Button pending={pending} disabled={kept.length === 0} onClick={save}>
-        {kept.length ? `Add ${kept.length} ${kept.length === 1 ? "product" : "products"}` : "Add products"}
+        {t(kept.length ? `Add ${kept.length} ${kept.length === 1 ? "product" : "products"}` : "Add products")}
       </Button>
     </div>
   );

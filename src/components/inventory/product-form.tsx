@@ -19,13 +19,15 @@ import {
   type Storage,
   type Unit,
 } from "@/lib/domain/constants";
-import { addDays, formatShortDate } from "@/lib/domain/dates";
+import { addDays } from "@/lib/domain/dates";
 import { centsToInput, parseMoneyToCents } from "@/lib/domain/format";
 import type { Product } from "@/lib/data/queries";
 import { cx } from "@/lib/cx";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Segmented, Select, Textarea, controlClass, describedBy } from "@/components/ui/field";
 import { useAction } from "@/components/ui/toast";
+import { useLang, useT } from "@/components/i18n/lang-provider";
+import { formatShortDate as formatDate } from "@/lib/domain/dates";
 import { useSavi } from "@/components/savi/savi-companion";
 
 export type ProductPrefill = Partial<Pick<Product, "name" | "quantity" | "unit" | "category" | "storage">>;
@@ -102,6 +104,8 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
     !product && prefill?.name ? matchCatalog(prefill.name) : undefined,
   );
   const { run, pending } = useAction();
+  const t = useT();
+  const lang = useLang();
   const savi = useSavi();
   const addAnother = useRef(false);
   const nameRef = useRef<HTMLInputElement>(null);
@@ -139,7 +143,7 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
 
   const choose = (entry: CatalogEntry) => {
     const keepTyped = form.name.trim().length > entry.label.length && matchCatalog(form.name)?.key === entry.key;
-    if (!keepTyped) set("name", entry.label);
+    if (!keepTyped) set("name", t(entry.label));
     applyEntry(entry);
     setListOpen(false);
     setActive(-1);
@@ -164,7 +168,7 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
     event.preventDefault();
     const priceCents = parseMoneyToCents(form.price);
     if (Number.isNaN(priceCents)) {
-      setErrors({ price_cents: "Enter a price like 3.49" });
+      setErrors({ price_cents: t("Enter a price like 3.49") });
       return;
     }
     const values = {
@@ -197,10 +201,10 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
   };
 
   const expiryHint = (() => {
-    if (touched.has("expires_on") || product) return "Use the date printed on the package.";
+    if (touched.has("expires_on") || product) return t("Use the date printed on the package.");
     const entry = suggestion;
-    if (!entry) return "Pre-filled one week out. Use the date printed on the package.";
-    return `Typical for ${entry.label.toLowerCase()} in the ${STORAGE_LABEL[form.storage].toLowerCase()}. Check the package date.`;
+    if (!entry) return t("Pre-filled one week out. Use the date printed on the package.");
+    return t("Typical for {food} in the {storage}. Check the package date.", { food: t(entry.label).toLowerCase(), storage: t(STORAGE_LABEL[form.storage]).toLowerCase() });
   })();
 
   const listId = id("suggestions");
@@ -217,7 +221,7 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
             value={form.name}
             autoFocus={!product}
             autoComplete="off"
-            placeholder="e.g. Baby spinach"
+            placeholder={t("e.g. Baby spinach")}
             role="combobox"
             aria-expanded={options.length > 0}
             aria-controls={listId}
@@ -253,7 +257,7 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
             <ul
               id={listId}
               role="listbox"
-              aria-label="Suggestions"
+              aria-label={t("Suggestions")}
               className="absolute inset-x-0 top-full z-10 mt-1.5 overflow-hidden rounded-lg border border-line bg-card py-1 shadow-lift animate-fade"
             >
               {options.map((entry, i) => (
@@ -272,9 +276,9 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
                     i === active && "bg-forest-wash",
                   )}
                 >
-                  <span>{entry.label}</span>
+                  <span>{t(entry.label)}</span>
                   <span className="text-xs text-muted">
-                    {CATEGORY_LABEL[entry.category]} · {STORAGE_LABEL[entry.storage]}
+                    {t(CATEGORY_LABEL[entry.category])} · {t(STORAGE_LABEL[entry.storage])}
                   </span>
                 </li>
               ))}
@@ -299,14 +303,14 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
           <Select id={id("unit")} value={form.unit} onChange={(e) => set("unit", e.target.value as Unit)}>
             {UNITS.map((u) => (
               <option key={u} value={u}>
-                {UNIT_LABEL[u]}
+                {t(UNIT_LABEL[u])}
               </option>
             ))}
           </Select>
         </Field>
       </div>
 
-      <Segmented name={id("storage")} label="Stored in" value={form.storage} options={STORAGE_OPTIONS} onChange={onStorageChange} />
+      <Segmented name={id("storage")} label={t("Stored in")} value={form.storage} options={STORAGE_OPTIONS} onChange={onStorageChange} />
 
       <Field id={id("expires")} label="Use-by / best-before date" error={errors.expires_on} hint={expiryHint}>
         <Input
@@ -318,7 +322,7 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
           aria-describedby={describedBy(id("expires"), errors.expires_on, expiryHint)}
           required
         />
-        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Quick date">
+        <div className="flex flex-wrap gap-1.5" role="group" aria-label={t("Quick date")}>
           {QUICK_DATES.map((q) => {
             const value = addDays(today, q.days);
             return (
@@ -327,7 +331,7 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
                 type="button"
                 onClick={() => set("expires_on", value)}
                 aria-pressed={form.expires_on === value}
-                title={formatShortDate(value)}
+                title={formatDate(value, lang)}
                 className={cx(
                   "h-8 rounded-full border px-3 text-xs font-medium transition-colors",
                   form.expires_on === value
@@ -335,7 +339,7 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
                     : "border-line-strong text-ink-2 hover:border-ink-2",
                 )}
               >
-                {q.label}
+                {t(q.label)}
               </button>
             );
           })}
@@ -346,7 +350,7 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
         <Select id={id("category")} value={form.category} onChange={(e) => set("category", e.target.value as Category)}>
           {CATEGORIES.map((c) => (
             <option key={c} value={c}>
-              {CATEGORY_LABEL[c]}
+              {t(CATEGORY_LABEL[c])}
             </option>
           ))}
         </Select>
@@ -359,7 +363,7 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
           aria-expanded={showMore}
           className="flex w-full items-center justify-between rounded-md py-1 text-sm font-medium text-ink-2 hover:text-ink"
         >
-          Purchase date, price and notes
+          {t("Purchase date, price and notes")}
           <ChevronDown className={cx("size-4 transition-transform", showMore && "rotate-180")} aria-hidden="true" />
         </button>
         {showMore && (
@@ -394,7 +398,7 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
                 id={id("notes")}
                 value={form.notes}
                 maxLength={500}
-                placeholder="Opened on Monday, top shelf…"
+                placeholder={t("Opened on Monday, top shelf…")}
                 onChange={(e) => set("notes", e.target.value)}
               />
             </Field>
@@ -412,11 +416,11 @@ export function ProductForm({ today, product, prefill, onDone }: Props) {
               addAnother.current = true;
             }}
           >
-            Save &amp; add another
+            {t("Save & add another")}
           </Button>
         )}
         <Button type="submit" pending={pending}>
-          {product ? "Save changes" : "Add to inventory"}
+          {t(product ? "Save changes" : "Add to inventory")}
         </Button>
       </div>
     </form>

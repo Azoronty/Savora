@@ -2,15 +2,18 @@
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatShortDate } from "@/lib/domain/dates";
+import { useLang, useT } from "@/components/i18n/lang-provider";
 import { formatMoney } from "@/lib/domain/format";
 
 type Week = { weekStart: string; count: number; costCents: number };
 
 /** Single-series weekly bars: one hue, thin marks, recessive axes, hover tooltip. */
 export function WasteTrend({ weeks }: { weeks: Week[] }) {
-  const data = weeks.map((w, i) => ({ ...w, label: i === weeks.length - 1 ? "This wk" : formatShortDate(w.weekStart) }));
+  const t = useT();
+  const lang = useLang();
+  const data = weeks.map((w, i) => ({ ...w, label: i === weeks.length - 1 ? t("This wk") : formatShortDate(w.weekStart, lang) }));
   return (
-    <div className="h-56 w-full" role="img" aria-label={`Items thrown away per week over the last ${weeks.length} weeks`}>
+    <div className="h-56 w-full" role="img" aria-label={t("Items thrown away per week over the last {n} weeks", { n: weeks.length })}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: -24 }} barCategoryGap="30%">
           <CartesianGrid vertical={false} stroke="var(--color-line)" />
@@ -29,9 +32,9 @@ export function WasteTrend({ weeks }: { weeks: Week[] }) {
               const w = payload[0].payload as Week & { label: string };
               return (
                 <div className="rounded-md border border-line bg-card px-3 py-2 text-xs shadow-lift">
-                  <p className="font-medium text-ink">Week of {formatShortDate(w.weekStart)}</p>
+                  <p className="font-medium text-ink">{t("Week of")} {formatShortDate(w.weekStart, lang)}</p>
                   <p className="text-ink-2">
-                    {w.count} {w.count === 1 ? "item" : "items"}
+                    {t(w.count === 1 ? "1 item" : `${w.count} items`)}
                     {w.costCents > 0 && ` · ${formatMoney(w.costCents)}`}
                   </p>
                 </div>

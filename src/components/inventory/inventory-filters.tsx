@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { CATEGORIES, CATEGORY_LABEL, STORAGES, STORAGE_LABEL } from "@/lib/domain/constants";
 import { cx } from "@/lib/cx";
+import { useT } from "@/components/i18n/lang-provider";
 import { Select, controlClass } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/button";
 
@@ -18,6 +19,7 @@ const STATUS_TABS = [
 /** Filters live in the URL, so views are shareable and the server does the querying. */
 export function InventoryFilters({ counts }: { counts: Record<string, number> }) {
   const router = useRouter();
+  const tr = useT();
   const pathname = usePathname();
   const params = useSearchParams();
   const [pending, startTransition] = useTransition();
@@ -47,7 +49,7 @@ export function InventoryFilters({ counts }: { counts: Record<string, number> })
 
   return (
     <div className="mb-6 flex flex-col gap-4">
-      <div role="tablist" aria-label="Filter by status" className="-mx-4 flex gap-1 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+      <div role="tablist" aria-label={tr("Filter by status")} className="-mx-4 flex gap-1 overflow-x-auto px-4 sm:mx-0 sm:px-0">
         {STATUS_TABS.map((tab) => {
           const active = status === tab.value;
           return (
@@ -62,7 +64,7 @@ export function InventoryFilters({ counts }: { counts: Record<string, number> })
                 active ? "bg-ink text-card" : "text-ink-2 hover:bg-paper-deep",
               )}
             >
-              {tab.label}
+              {tr(tab.label)}
               <span className={cx("font-mono text-[0.6875rem] tabular", active ? "text-card/70" : "text-muted")}>
                 {counts[tab.value || "all"] ?? 0}
               </span>
@@ -74,7 +76,7 @@ export function InventoryFilters({ counts }: { counts: Record<string, number> })
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_11rem_11rem_12.5rem]">
         <div className="relative sm:col-span-2 lg:col-span-1">
           <label htmlFor="inventory-search" className="sr-only">
-            Search products
+            {tr("Search products")}
           </label>
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" aria-hidden="true" />
           <input
@@ -82,32 +84,32 @@ export function InventoryFilters({ counts }: { counts: Record<string, number> })
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search your kitchen"
+            placeholder={tr("Search your kitchen")}
             className={cx(controlClass, "pl-9 pr-9")}
           />
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted">{pending && <Spinner />}</span>
         </div>
-        <FilterSelect label="Category" value={params.get("category") ?? ""} onChange={(v) => update("category", v)}>
-          <option value="">All categories</option>
+        <FilterSelect label={tr("Category")} value={params.get("category") ?? ""} onChange={(v) => update("category", v)}>
+          <option value="">{tr("All categories")}</option>
           {CATEGORIES.map((c) => (
             <option key={c} value={c}>
-              {CATEGORY_LABEL[c]}
+              {tr(CATEGORY_LABEL[c])}
             </option>
           ))}
         </FilterSelect>
-        <FilterSelect label="Storage" value={params.get("storage") ?? ""} onChange={(v) => update("storage", v)}>
-          <option value="">All storage</option>
+        <FilterSelect label={tr("Storage")} value={params.get("storage") ?? ""} onChange={(v) => update("storage", v)}>
+          <option value="">{tr("All storage")}</option>
           {STORAGES.map((s) => (
             <option key={s} value={s}>
-              {STORAGE_LABEL[s]}
+              {tr(STORAGE_LABEL[s])}
             </option>
           ))}
         </FilterSelect>
-        <FilterSelect label="Sort" value={params.get("sort") ?? "expiry"} onChange={(v) => update("sort", v === "expiry" ? "" : v)}>
-          <option value="expiry">Sort: soonest date</option>
-          <option value="name">Sort: name A–Z</option>
-          <option value="category">Sort: category</option>
-          <option value="recent">Sort: recently added</option>
+        <FilterSelect label={tr("Sort")} value={params.get("sort") ?? "expiry"} onChange={(v) => update("sort", v === "expiry" ? "" : v)}>
+          <option value="expiry">{tr("Sort: soonest date")}</option>
+          <option value="name">{tr("Sort: name A–Z")}</option>
+          <option value="category">{tr("Sort: category")}</option>
+          <option value="recent">{tr("Sort: recently added")}</option>
         </FilterSelect>
       </div>
       {hasFilters && (
@@ -119,7 +121,7 @@ export function InventoryFilters({ counts }: { counts: Record<string, number> })
           }}
           className="inline-flex items-center gap-1 self-start text-sm text-muted hover:text-ink"
         >
-          <X className="size-3.5" aria-hidden="true" /> Clear filters
+          <X className="size-3.5" aria-hidden="true" /> {tr("Clear filters")}
         </button>
       )}
     </div>

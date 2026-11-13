@@ -34,8 +34,8 @@
   --color-expired: #9a3a26;
   --color-expired-soft: #f3dcd3;
 
-  --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
-  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), var(--font-literata), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-instrument), var(--font-golos), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
   --radius-sm: 6px;

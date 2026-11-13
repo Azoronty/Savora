@@ -17,6 +17,7 @@ import {
 } from "@/lib/domain/savi";
 import { cx } from "@/lib/cx";
 import { useProductSheet } from "@/components/app/product-sheet";
+import { useT } from "@/components/i18n/lang-provider";
 import { SaviPuppet, type PuppetHandle } from "./savi-puppet";
 
 type Gsap = typeof import("gsap").gsap;
@@ -86,6 +87,7 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
   const stage = progress.stage;
   const pathname = usePathname();
   const { openNew } = useProductSheet();
+  const t = useT();
 
   const outer = useRef<HTMLDivElement>(null); // position + hops
   const body = useRef<HTMLButtonElement>(null); // facing, tilt, spin
@@ -161,7 +163,7 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
       return { x: r.left + r.width * 0.3, y: r.bottom - 6, minX: r.left + 44, maxX: r.right - 44 };
     }
     // Phones: Savi stands on the top edge of the bottom navigation and walks along it.
-    const nav = document.querySelector<HTMLElement>("nav[aria-label='Main'].fixed")?.getBoundingClientRect();
+    const nav = document.querySelector<HTMLElement>("nav[data-main-nav].fixed")?.getBoundingClientRect();
     const y = nav ? nav.top + 1 : window.innerHeight - 64;
     const minX = (nav?.left ?? 0) + 32;
     const maxX = (nav?.right ?? window.innerWidth) - 32;
@@ -477,7 +479,7 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
       for (let t = 0; t < 60 && !ok(); t++) await sleep(100);
     };
     const visible = (href: string) =>
-      [...document.querySelectorAll<HTMLElement>(`nav[aria-label='Main'] a[href="${href}"]`)].find((a) => a.getBoundingClientRect().width > 0);
+      [...document.querySelectorAll<HTMLElement>(`nav[data-main-nav] a[href="${href}"]`)].find((a) => a.getBoundingClientRect().width > 0);
     const goTo = async (el?: HTMLElement) => {
       const h = home();
       if (!el) return desktop ? hopTo(h.x, h.y) : travel(h.x, h.y, "walk");
@@ -587,7 +589,7 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
     const newMissions = data.missionsDone.filter((m) => !seenMissions.includes(m));
     const timers: ReturnType<typeof setTimeout>[] = [];
 
-    if (seenXp >= 0 && data.xp > seenXp) timers.push(setTimeout(() => addFx("xp", `+${data.xp - seenXp} XP`), 600));
+    if (seenXp >= 0 && data.xp > seenXp) timers.push(setTimeout(() => addFx("xp", t("+{n} XP", { n: data.xp - seenXp })), 600));
     if (seenStage && stage.n > seenStage) {
       // Show the previous form first so the level-up reveal can swap it (localStorage is client-only).
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -739,7 +741,7 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
     handle({ type: "pet", tip: tipIndex.current++ });
   };
 
-  const label = useMemo(() => `Savi, your kitchen companion. Stage ${stage.n}: ${stage.name}. ${data.xp} XP.`, [stage, data.xp]);
+  const label = useMemo(() => t("Savi, your kitchen companion. Stage {n}: {name}. {xp} XP.", { n: stage.n, name: t(stage.name), xp: data.xp }), [stage, data.xp, t]);
 
   return (
     <div aria-live="polite" className="pointer-events-none fixed left-0 top-0 z-[45]" style={{ width: 0, height: 0 }}>
@@ -778,12 +780,12 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
             <button
               type="button"
               onClick={dismiss}
-              aria-label="Dismiss Savi's message"
+              aria-label={t("Dismiss Savi's message")}
               className="absolute right-1.5 top-1.5 inline-flex size-6 items-center justify-center rounded-full text-muted hover:bg-paper-deep hover:text-ink"
             >
               <X className="size-3.5" />
             </button>
-            <p className="pr-5 leading-snug">{speech.text}</p>
+            <p className="pr-5 leading-snug">{t(speech.text)}</p>
             {speech.action &&
               (speech.action.href ? (
                 <Link
@@ -791,7 +793,7 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
                   onClick={dismiss}
                   className="mt-2 inline-flex h-8 items-center rounded-full bg-forest px-3 text-xs font-medium text-card hover:bg-forest-deep"
                 >
-                  {speech.action.label}
+                  {t(speech.action.label)}
                 </Link>
               ) : (
                 <button
@@ -802,7 +804,7 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
                   }}
                   className="mt-2 inline-flex h-8 items-center rounded-full bg-forest px-3 text-xs font-medium text-card hover:bg-forest-deep"
                 >
-                  {speech.action.label}
+                  {t(speech.action.label)}
                 </button>
               ))}
             <span
@@ -822,7 +824,7 @@ function SaviCompanion({ data, register }: { data: SaviContextData; register: (f
           type="button"
           onClick={onPet}
           aria-label={label}
-          title={`Savi · ${stage.name}`}
+          title={`Savi · ${t(stage.name)}`}
           className="savi-body pointer-events-auto absolute bottom-0 left-0 block -translate-x-1/2 cursor-pointer select-none rounded-full outline-offset-4"
           style={{ height }}
         >
@@ -882,23 +884,24 @@ function TourCard({
   onAnswer: (go: boolean) => void;
 }) {
   const last = SAVI_TOUR.length - 1;
+  const t = useT();
   // Desktop: opens to the right of Savi. Phone: full width with a 16px gutter, pointer above Savi.
   const left = desktop ? x - 32 : 16;
   const arrow = Math.min(Math.max(x - left - 7, 20), (desktop ? 352 : vw - 32) - 34);
   return (
     <div
       role="dialog"
-      aria-label="Savi's tour"
+      aria-label={t("Savi's tour")}
       onKeyDown={(e) => e.key === "Escape" && onAnswer(false)}
       className="pointer-events-auto fixed animate-rise rounded-2xl border border-line bg-card p-5 text-ink shadow-lift"
       style={desktop ? { left, bottom, width: 352 } : { left, right: 16, bottom }}
     >
       {step > 0 && step < last && (
         <p className="font-mono text-[0.7rem] uppercase tracking-[0.14em] text-muted">
-          Tour · {n} of {total}
+          {t("Tour · {n} of {total}", { n, total })}
         </p>
       )}
-      <p className={cx("text-base leading-snug sm:text-[1.0625rem]", step > 0 && step < last && "mt-1.5")}>{SAVI_TOUR[step].text}</p>
+      <p className={cx("text-base leading-snug sm:text-[1.0625rem]", step > 0 && step < last && "mt-1.5")}>{t(SAVI_TOUR[step].text)}</p>
       <div className="mt-4 flex items-center gap-2">
         <button
           type="button"
@@ -906,7 +909,7 @@ function TourCard({
           onClick={() => onAnswer(true)}
           className="inline-flex h-10 items-center rounded-full bg-forest px-5 text-sm font-medium text-card hover:bg-forest-deep"
         >
-          {step === 0 ? "Show me" : step === last ? "Done" : "Next"}
+          {t(step === 0 ? "Show me" : step === last ? "Done" : "Next")}
         </button>
         {step < last && (
           <button
@@ -914,7 +917,7 @@ function TourCard({
             onClick={() => onAnswer(false)}
             className="inline-flex h-10 items-center rounded-full px-4 text-sm font-medium text-muted hover:bg-paper-deep hover:text-ink"
           >
-            {step === 0 ? "Not now" : "Skip tour"}
+            {t(step === 0 ? "Not now" : "Skip tour")}
           </button>
         )}
       </div>

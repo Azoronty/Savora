@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Tx } from "@/components/i18n/lang-provider";
 
 /** The SAVORA mark: the orange-slice "O" with its sprout, taken from the wordmark. */
 export function LogoMark({ className = "size-9" }: { className?: string }) {
@@ -20,7 +21,7 @@ export function Logo({ href = "/", tone = "ink" }: { href?: string; tone?: "ink"
         height={373}
         className="h-10 w-auto transition-transform duration-500 ease-out group-hover:-translate-y-0.5"
       />
-      <span className={`pl-0.5 font-mono text-[0.55rem] uppercase tracking-[0.24em] ${tone === "paper" ? "text-paper/70" : "text-muted"}`}>Save food · Save tomorrow</span>
+      <span className={`whitespace-nowrap pl-0.5 font-mono text-[0.55rem] uppercase tracking-[0.24em] ${tone === "paper" ? "text-paper/70" : "text-muted"}`}><Tx>Save food · Save tomorrow</Tx></span>
     </Link>
   );
 }

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cx } from "@/lib/cx";
+import { Tx } from "@/components/i18n/lang-provider";
 
 export function EmptyState({
   icon,
@@ -22,8 +23,8 @@ export function EmptyState({
       )}
     >
       <div className="mb-5 flex size-14 items-center justify-center rounded-full bg-forest-wash text-forest-mid">{icon}</div>
-      <h3 className="text-xl font-medium">{title}</h3>
-      {children && <div className="mt-2 max-w-sm text-[0.9375rem] text-muted">{children}</div>}
+      <h3 className="text-xl font-medium"><Tx>{title}</Tx></h3>
+      {children && <div className="mt-2 max-w-sm text-[0.9375rem] text-muted">{typeof children === "string" ? <Tx>{children}</Tx> : children}</div>}
       {action && <div className="mt-6">{action}</div>}
     </div>
   );

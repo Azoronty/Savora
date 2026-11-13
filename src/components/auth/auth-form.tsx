@@ -7,18 +7,20 @@ import type { ActionResult } from "@/lib/actions/result";
 import { Button } from "@/components/ui/button";
 import { Field, Input, describedBy } from "@/components/ui/field";
 import { DemoButton } from "./demo-button";
+import { useT } from "@/components/i18n/lang-provider";
 
 export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: string }) {
   const [state, action, pending] = useActionState<ActionResult | null, FormData>(mode === "login" ? signIn : signUp, null);
   const errors = state && !state.ok ? (state.fieldErrors ?? {}) : {};
   const formError = state && !state.ok && !state.fieldErrors ? state.error : null;
   const notice = state?.ok ? state.message : null;
+  const t = useT();
 
   return (
     <div className="w-full max-w-[25rem]">
-      <h1 className="text-[2.4rem] font-normal leading-[1.05]">{mode === "login" ? "Welcome back." : "Make your kitchen easier."}</h1>
+      <h1 className="text-[2.4rem] font-normal leading-[1.05]">{t(mode === "login" ? "Welcome back." : "Make your kitchen easier.")}</h1>
       <p className="mt-3 text-[0.9375rem] text-muted">
-        {mode === "login" ? "Sign in to see what needs using today." : "Free to use. Your data stays private to your household."}
+        {t(mode === "login" ? "Sign in to see what needs using today." : "Free to use. Your data stays private to your household.")}
       </p>
 
       <form action={action} className="mt-8 flex flex-col gap-4" noValidate>
@@ -53,31 +55,31 @@ export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: stri
         </Field>
         {formError && (
           <p role="alert" className="rounded-md bg-expired-soft px-3 py-2.5 text-sm text-expired">
-            {formError}
+            {t(formError)}
           </p>
         )}
         {notice && (
           <p role="status" className="rounded-md bg-fresh-soft px-3 py-2.5 text-sm text-fresh">
-            {notice}
+            {t(notice)}
           </p>
         )}
         <Button type="submit" size="lg" pending={pending} className="mt-2">
-          {mode === "login" ? "Sign in" : "Create account"}
+          {t(mode === "login" ? "Sign in" : "Create account")}
         </Button>
       </form>
 
       <div className="my-7 flex items-center gap-4 text-xs text-muted">
         <span className="h-px flex-1 bg-line" />
-        or
+        {t("or")}
         <span className="h-px flex-1 bg-line" />
       </div>
       <DemoButton variant="secondary" />
-      <p className="mt-3 text-center text-[0.8125rem] text-muted">Opens a sample kitchen. No email needed.</p>
+      <p className="mt-3 text-center text-[0.8125rem] text-muted">{t("Opens a sample kitchen. No email needed.")}</p>
 
       <p className="mt-10 text-center text-sm text-ink-2">
-        {mode === "login" ? "New to Savora? " : "Already have an account? "}
+        {t(mode === "login" ? "New to Savora?" : "Already have an account?")}{" "}
         <Link href={mode === "login" ? "/signup" : "/login"} className="font-medium text-forest-mid underline-offset-4 hover:underline">
-          {mode === "login" ? "Create an account" : "Sign in"}
+          {t(mode === "login" ? "Create an account" : "Sign in")}
         </Link>
       </p>
     </div>

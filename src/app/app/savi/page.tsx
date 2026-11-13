@@ -10,26 +10,31 @@ import { getRecipe } from "@/lib/domain/recipes";
 import { SAVI_MISSIONS, SAVI_STAGES, SAVI_XP_RULES, saviProgress } from "@/lib/domain/savi";
 import { getSaviState } from "@/lib/data/queries";
 import { requireViewer } from "@/lib/data/session";
+import { getLang, getT } from "@/lib/i18n/server";
+import type { T } from "@/lib/i18n/core";
 
-export const metadata: Metadata = { title: "Savi" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT())("Savi") };
+}
 
 
-function describe(kind: string, label: string | null): string {
+function describe(kind: string, label: string | null, t: T): string {
+  const name = label ? t(label) : t("a product");
   switch (kind) {
     case "product_added":
-      return `Added ${label ?? "a product"}`;
+      return t("Added {name}", { name });
     case "product_used":
-      return `Used ${label ?? "a product"}`;
+      return t("Used {name}", { name });
     case "food_rescued":
-      return `Rescued ${label ?? "a product"} before its date`;
+      return t("Rescued {name} before its date", { name });
     case "recipe_cooked":
-      return `Cooked ${label ? (getRecipe(label)?.title.toLowerCase() ?? label) : "a recipe"}`;
+      return t("Cooked {name}", { name: label ? t(getRecipe(label)?.title ?? label) : t("a recipe") });
     case "shopping_stocked":
-      return `Put away shopping (${label ?? "items"})`;
+      return t("Put away shopping ({n})", { n: label ?? t("items") });
     case "demo_boost":
-      return "Demo boost (sample XP)";
+      return t("Demo boost (sample XP)");
     case "mission_completed":
-      return `Mission complete: ${SAVI_MISSIONS.find((m) => m.key === label)?.title ?? label}`;
+      return t("Mission complete: {name}", { name: t(SAVI_MISSIONS.find((m) => m.key === label)?.title ?? label ?? "") });
     default:
       return kind;
   }
@@ -37,9 +42,10 @@ function describe(kind: string, label: string | null): string {
 
 export default async function SaviPage() {
   const viewer = await requireViewer();
+  const [t, lang] = [await getT(), await getLang()];
   const savi = await getSaviState(viewer, 12);
   const p = saviProgress(savi.xp);
-  const timeFormat = new Intl.DateTimeFormat("en-GB", {
+  const timeFormat = new Intl.DateTimeFormat(lang === "ru" ? "ru-RU" : "en-GB", {
     day: "numeric",
     month: "short",
     hour: "2-digit",
@@ -55,25 +61,25 @@ export default async function SaviPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Your kitchen companion" title="Savi" description="Savi grows when food gets used instead of thrown away. Every XP point comes from something you actually did." />
+      <PageHeader eyebrow={t("Your kitchen companion")} title="Savi" description="Savi grows when food gets used instead of thrown away. Every XP point comes from something you actually did." />
 
       <section className="mb-12 grid overflow-hidden rounded-2xl border border-line bg-card md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <div className="relative flex min-h-72 items-end justify-center bg-[radial-gradient(ellipse_at_50%_85%,var(--color-saffron-soft),transparent_65%)] p-8">
           {/* eslint-disable-next-line @next/next/no-img-element -- small sprite */}
-          <img src={`/savi/stage-${p.stage.n}.webp`} alt={`Savi at stage ${p.stage.n}, ${p.stage.name}`} className="savi-float relative h-56 w-auto drop-shadow-[0_18px_24px_rgba(20,42,30,0.22)]" />
+          <img src={`/savi/stage-${p.stage.n}.webp`} alt={t("Savi stage {n}: {name}", { n: p.stage.n, name: t(p.stage.name) })} className="savi-float relative h-56 w-auto drop-shadow-[0_18px_24px_rgba(20,42,30,0.22)]" />
         </div>
         <div className="flex flex-col justify-center gap-5 border-t border-line p-7 md:border-l md:border-t-0 sm:p-9">
           <div>
-            <p className="eyebrow mb-2">Stage {p.stage.n} of 7</p>
-            <h2 className="text-[2.4rem] font-normal leading-none">{p.stage.name}</h2>
-            <p className="mt-2 text-muted">{p.stage.blurb}</p>
+            <p className="eyebrow mb-2">{t("Stage {n} of 7", { n: p.stage.n })}</p>
+            <h2 className="text-[2.4rem] font-normal leading-none">{t(p.stage.name)}</h2>
+            <p className="mt-2 text-muted">{t(p.stage.blurb)}</p>
           </div>
           <div>
             <div className="mb-2 flex items-baseline justify-between text-sm">
-              <span className="font-display text-3xl tabular">{savi.xp} XP</span>
-              <span className="text-muted">{p.next ? `${p.xpToNext} XP to ${p.next.name}` : "Fully grown"}</span>
+              <span className="font-display text-3xl tabular">{t("{n} XP", { n: savi.xp })}</span>
+              <span className="text-muted">{p.next ? t("{n} XP to {name}", { n: p.xpToNext, name: t(p.next.name) }) : t("Fully grown")}</span>
             </div>
-            <div className="h-2.5 overflow-hidden rounded-full bg-paper-deep" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(p.fraction * 100)} aria-label="Progress to next stage">
+            <div className="h-2.5 overflow-hidden rounded-full bg-paper-deep" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(p.fraction * 100)} aria-label={t("Progress to next stage")}>
               <div className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-chart),var(--color-saffron))]" style={{ width: `${Math.max(3, p.fraction * 100)}%` }} />
             </div>
             {viewer.isAnonymous && <DemoLevelUp maxed={!p.next} />}
@@ -82,8 +88,8 @@ export default async function SaviPage() {
       </section>
 
       <section className="mb-12" aria-labelledby="missions-heading">
-        <p className="eyebrow mb-1.5">Food rescue missions</p>
-        <h2 id="missions-heading" className="mb-5 text-[1.6rem] font-normal">Today</h2>
+        <p className="eyebrow mb-1.5">{t("Food rescue missions")}</p>
+        <h2 id="missions-heading" className="mb-5 text-[1.6rem] font-normal">{t("Today")}</h2>
         <ul className="grid gap-4 md:grid-cols-3">
           {SAVI_MISSIONS.map((m) => {
             const done = savi.missionsDone.includes(m.key);
@@ -91,10 +97,10 @@ export default async function SaviPage() {
             return (
               <li key={m.key} className={cx("flex flex-col rounded-xl border p-5", done ? "border-forest/25 bg-forest-wash" : "border-line bg-card")}>
                 <div className="flex items-center justify-between">
-                  <span className={cx("rounded-full px-2.5 py-0.5 font-mono text-xs", done ? "bg-forest text-card" : "bg-saffron-soft text-soon")}>+{m.xp} XP</span>
+                  <span className={cx("rounded-full px-2.5 py-0.5 font-mono text-xs", done ? "bg-forest text-card" : "bg-saffron-soft text-soon")}>{t("+{n} XP", { n: m.xp })}</span>
                   {done ? (
                     <span className="inline-flex items-center gap-1 text-sm font-medium text-forest-mid">
-                      <Check className="size-4" aria-hidden="true" /> Done
+                      <Check className="size-4" aria-hidden="true" /> {t("Done")}
                     </span>
                   ) : (
                     <span className="font-mono text-xs text-muted tabular">
@@ -102,11 +108,11 @@ export default async function SaviPage() {
                     </span>
                   )}
                 </div>
-                <h3 className="mt-4 font-sans text-lg font-medium">{m.title}</h3>
-                <p className="mt-1 text-sm text-muted">{m.detail}</p>
+                <h3 className="mt-4 font-sans text-lg font-medium">{t(m.title)}</h3>
+                <p className="mt-1 text-sm text-muted">{t(m.detail)}</p>
                 {!done && (
                   <Link href={m.href} className="mt-auto pt-4 text-sm font-medium text-forest-mid hover:underline">
-                    {m.cta} →
+                    {t(m.cta)} →
                   </Link>
                 )}
               </li>
@@ -116,8 +122,8 @@ export default async function SaviPage() {
       </section>
 
       <section className="mb-12" aria-labelledby="stages-heading">
-        <p className="eyebrow mb-1.5">Evolution</p>
-        <h2 id="stages-heading" className="mb-5 text-[1.6rem] font-normal">Seven stages</h2>
+        <p className="eyebrow mb-1.5">{t("Evolution")}</p>
+        <h2 id="stages-heading" className="mb-5 text-[1.6rem] font-normal">{t("Seven stages")}</h2>
         <ol className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-7 sm:overflow-visible sm:px-0">
           {SAVI_STAGES.map((s) => {
             const unlocked = savi.xp >= s.minXp;
@@ -134,16 +140,16 @@ export default async function SaviPage() {
                   {/* eslint-disable-next-line @next/next/no-img-element -- small sprite */}
                   <img
                     src={`/savi/stage-${s.n}.webp`}
-                    alt={unlocked ? `Savi stage ${s.n}` : `Locked stage ${s.n}`}
+                    alt={t(unlocked ? "Savi stage {n}" : "Locked stage {n}", { n: s.n })}
                     className={cx("w-auto", unlocked ? "" : "opacity-[0.12] brightness-0")}
                     style={{ height: 56 + s.n * 7 }}
                   />
                 </div>
                 <p className="mt-3 font-mono text-[0.6875rem] text-muted">0{s.n}</p>
-                <p className="text-sm font-medium">{s.name}</p>
+                <p className="text-sm font-medium">{t(s.name)}</p>
                 <p className="mt-1 flex items-center gap-1 text-xs text-muted">
                   {!unlocked && <Lock className="size-3" aria-hidden="true" />}
-                  {s.minXp} XP
+                  {t("{n} XP", { n: s.minXp })}
                 </p>
               </li>
             );
@@ -153,38 +159,37 @@ export default async function SaviPage() {
 
       <div className="grid gap-10 lg:grid-cols-2">
         <section aria-labelledby="xp-heading">
-          <h2 id="xp-heading" className="mb-4 text-xl font-medium">How Savi grows</h2>
+          <h2 id="xp-heading" className="mb-4 text-xl font-medium">{t("How Savi grows")}</h2>
           <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-card">
             {SAVI_XP_RULES.map((r) => (
               <li key={r.action} className="flex items-center justify-between gap-4 px-5 py-3.5 text-sm">
-                <span>{r.action}</span>
+                <span>{t(r.action)}</span>
                 <span className="shrink-0 text-right">
                   <span className="font-mono font-medium tabular">+{r.xp}</span>
-                  <span className="block text-xs text-muted">{r.cap}</span>
+                  <span className="block text-xs text-muted">{t(r.cap)}</span>
                 </span>
               </li>
             ))}
           </ul>
           <p className="mt-3 text-[0.8125rem] text-muted">
-            XP is recorded by the database when the action happens, with daily limits. Loading the sample kitchen earns nothing, and throwing food away
-            never costs XP.
+            {t("XP is recorded by the database when the action happens, with daily limits. Loading the sample kitchen earns nothing, and throwing food away never costs XP.")}
           </p>
-          <h2 className="mb-4 mt-10 text-xl font-medium">Settings</h2>
+          <h2 className="mb-4 mt-10 text-xl font-medium">{t("Settings")}</h2>
           <SaviSettings mode={viewer.saviMode} />
         </section>
 
         <section aria-labelledby="activity-heading">
-          <h2 id="activity-heading" className="mb-4 text-xl font-medium">Recent activity</h2>
+          <h2 id="activity-heading" className="mb-4 text-xl font-medium">{t("Recent activity")}</h2>
           {savi.recent.length === 0 ? (
             <p className="rounded-xl border border-dashed border-line-strong p-6 text-sm text-muted">
-              Nothing yet. Add a product or mark something as used, and Savi will start growing.
+              {t("Nothing yet. Add a product or mark something as used, and Savi will start growing.")}
             </p>
           ) : (
             <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-card">
               {savi.recent.map((e) => (
                 <li key={e.id} className="flex items-center justify-between gap-4 px-5 py-3.5 text-sm">
                   <span className="min-w-0">
-                    <span className="block truncate">{describe(e.kind, e.label)}</span>
+                    <span className="block truncate">{describe(e.kind, e.label, t)}</span>
                     <span className="text-xs text-muted">{timeFormat.format(new Date(e.created_at))}</span>
                   </span>
                   <span className={cx("shrink-0 font-mono text-sm tabular", e.xp ? "text-forest-mid" : "text-muted")}>+{e.xp}</span>
