@@ -24,7 +24,7 @@ export function ProductRow({ product, today, risk }: { product: Product; today: 
   const expiry = getExpiry(product.expires_on, today);
   const StorageIcon = STORAGE_ICON[product.storage];
   return (
-    <li data-savi-product={product.name} className="group grid grid-cols-[minmax(0,1fr)_4.5rem_auto] items-center gap-x-3 gap-y-1 sm:gap-x-4 px-4 py-3.5 transition-colors hover:bg-white/60 sm:grid-cols-[auto_minmax(0,1fr)_5.5rem_8.5rem_7rem_auto] sm:px-5 lg:grid-cols-[auto_minmax(0,1fr)_6rem_8.5rem_7rem_auto] xl:grid-cols-[auto_minmax(0,1fr)_6.5rem_8.5rem_7rem_auto] 2xl:grid-cols-[auto_minmax(0,1fr)_7rem_8.5rem_7rem_auto]">
+    <li data-savi-product={product.name} className="group grid grid-cols-[minmax(0,1fr)_3.5rem_auto] items-center gap-x-3 gap-y-1 sm:gap-x-4 px-4 py-3.5 transition-colors hover:bg-white/60 sm:grid-cols-[auto_minmax(0,1fr)_3rem_8.5rem_7rem_auto] sm:px-5">
       {/* Phones: the photo shows the food, so the icon steps aside to give the name room. */}
       <CategoryIcon category={product.category} name={product.name} className="max-sm:hidden" />
       <div className="min-w-0">
