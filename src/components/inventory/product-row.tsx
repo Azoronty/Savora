@@ -5,7 +5,7 @@ import { formatQuantity } from "@/lib/domain/format";
 import type { Product } from "@/lib/data/queries";
 import type { WasteRisk } from "@/lib/domain/predict";
 import { cx } from "@/lib/cx";
-import { CategoryIcon, foodPhoto } from "@/components/ui/category-icon";
+import { foodPhoto } from "@/components/ui/category-icon";
 import { FreshnessBar, StatusDot, StatusPill } from "@/components/ui/status";
 import { ProductActions } from "./product-actions";
 import { DateText, Tx } from "@/components/i18n/lang-provider";
@@ -24,9 +24,12 @@ export function ProductRow({ product, today, risk }: { product: Product; today: 
   const expiry = getExpiry(product.expires_on, today);
   const StorageIcon = STORAGE_ICON[product.storage];
   return (
-    <li data-savi-product={product.name} className="group grid grid-cols-[minmax(0,1fr)_3.5rem_auto] items-center gap-x-3 gap-y-1 sm:gap-x-4 px-4 py-3.5 transition-colors hover:bg-white/60 sm:grid-cols-[auto_minmax(0,1fr)_3rem_8.5rem_7rem_auto] sm:px-5">
-      {/* Phones: the photo shows the food, so the icon steps aside to give the name room. */}
-      <CategoryIcon category={product.category} name={product.name} className="max-sm:hidden" />
+    <li data-savi-product={product.name} className="group grid grid-cols-[3.5rem_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 py-3.5 pr-4 transition-colors hover:bg-white/60 sm:grid-cols-[3.5rem_minmax(0,1fr)_8.5rem_7rem_auto] sm:gap-x-4 sm:pr-5">
+      {/* The row starts with a photo of the food, flush with the card's left edge and the full row height. */}
+      <div className="relative -my-3.5 self-stretch overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element -- small decorative photo, lazy */}
+        <img src={foodPhoto(product.category, product.name)} alt="" loading="lazy" decoding="async" className="absolute inset-0 size-full object-cover" />
+      </div>
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <p className="truncate font-medium"><Tx>{product.name}</Tx></p>
@@ -55,11 +58,6 @@ export function ProductRow({ product, today, risk }: { product: Product; today: 
           <StatusDot status={expiry.status} className="shrink-0" />
           <span className={cx("min-w-0 truncate tabular", expiry.status === "fresh" ? "text-muted" : "text-ink-2")}><Tx>{expiry.label}</Tx></span>
         </p>
-      </div>
-      {/* Photo of the food in its own narrow column: straight edges, full row height; decorative. */}
-      <div className="relative -my-3.5 self-stretch overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element -- small decorative photo, lazy */}
-        <img src={foodPhoto(product.category, product.name)} alt="" loading="lazy" decoding="async" className="absolute inset-0 size-full object-cover" />
       </div>
       <div className="hidden sm:block">
         <p className="font-mono text-[0.8125rem] tabular text-ink"><DateText iso={product.expires_on} /></p>
