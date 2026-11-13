@@ -66,7 +66,7 @@ export function ProductActions({ product, today, compact = false }: { product: P
             }}
             aria-label={t("Mark all {name} as used", { name: t(product.name) })}
           >
-            <Check className="size-4" aria-hidden="true" /> {t("Used")}
+            <Check className="size-4" aria-hidden="true" /> <span className="max-xl:hidden">{t("Used")}</span>
           </Button>
         </span>
       )}
