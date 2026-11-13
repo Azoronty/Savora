@@ -62,8 +62,8 @@ export default async function InventoryPage({ searchParams }: PageProps<"/app/in
         </EmptyState>
       ) : (
         <div className="overflow-hidden rounded-xl border border-line bg-card">
-          <div className="hidden grid-cols-[3.5rem_minmax(0,1fr)_8.5rem_7rem_auto] gap-x-4 border-b border-line py-2.5 pr-5 sm:grid">
-            <span />
+          <div className="hidden grid-cols-[auto_minmax(0,1fr)_8.5rem_7rem_auto] gap-x-4 border-b border-line px-5 py-2.5 sm:grid">
+            <span className="w-10" />
             <span className="eyebrow">{t("Product")}</span>
             <span className="eyebrow">{t("Date")}</span>
             <span className="eyebrow">{t("Status")}</span>

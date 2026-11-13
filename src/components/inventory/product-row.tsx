@@ -5,8 +5,8 @@ import { formatQuantity } from "@/lib/domain/format";
 import type { Product } from "@/lib/data/queries";
 import type { WasteRisk } from "@/lib/domain/predict";
 import { cx } from "@/lib/cx";
-import { foodPhoto } from "@/components/ui/category-icon";
-import { FreshnessBar, StatusDot, StatusPill } from "@/components/ui/status";
+import { CategoryIcon } from "@/components/ui/category-icon";
+import { FreshnessBar, StatusPill } from "@/components/ui/status";
 import { ProductActions } from "./product-actions";
 import { DateText, Tx } from "@/components/i18n/lang-provider";
 
@@ -24,19 +24,17 @@ export function ProductRow({ product, today, risk }: { product: Product; today: 
   const expiry = getExpiry(product.expires_on, today);
   const StorageIcon = STORAGE_ICON[product.storage];
   return (
-    <li data-savi-product={product.name} className="group grid grid-cols-[3.5rem_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 py-3.5 pr-4 transition-colors hover:bg-white/60 sm:grid-cols-[3.5rem_minmax(0,1fr)_8.5rem_7rem_auto] sm:gap-x-4 sm:pr-5">
-      {/* The row starts with a photo of the food, flush with the card's left edge and the full row height. */}
-      <div className="relative -my-3.5 self-stretch overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element -- small decorative photo, lazy */}
-        <img src={foodPhoto(product.category, product.name)} alt="" loading="lazy" decoding="async" className="absolute inset-0 size-full object-cover" />
-      </div>
+    <li data-savi-product={product.name} className="group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-4 py-3.5 transition-colors hover:bg-white/60 sm:grid-cols-[auto_minmax(0,1fr)_8.5rem_7rem_auto] sm:px-5">
+      <CategoryIcon category={product.category} name={product.name} />
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <p className="truncate font-medium"><Tx>{product.name}</Tx></p>
+          {product.is_demo && <SampleTag />}
           {risk && (
             <span
+              
               className={cx(
-                "shrink-0 rounded-sm px-1.5 text-[0.6875rem] font-medium leading-4 max-xl:hidden",
+                "hidden shrink-0 rounded-sm px-1.5 text-[0.6875rem] font-medium leading-4 sm:inline",
                 risk.level === "high" ? "bg-expired-soft text-expired" : "bg-soon-soft text-soon",
               )}
             >
@@ -55,8 +53,8 @@ export function ProductRow({ product, today, risk }: { product: Product; today: 
         </p>
         {/* Mobile: date + status under the name */}
         <p className="mt-1.5 flex items-center gap-2 text-[0.8125rem] sm:hidden">
-          <StatusDot status={expiry.status} className="shrink-0" />
-          <span className={cx("min-w-0 truncate tabular", expiry.status === "fresh" ? "text-muted" : "text-ink-2")}><Tx>{expiry.label}</Tx></span>
+          <StatusPill status={expiry.status} />
+          <span className={cx("tabular", expiry.status === "fresh" ? "text-muted" : "text-ink-2")}><Tx>{expiry.label}</Tx></span>
         </p>
       </div>
       <div className="hidden sm:block">

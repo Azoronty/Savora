@@ -49,25 +49,6 @@ const TINT: Record<Category, string> = {
   other: "bg-paper-deep text-ink-2",
 };
 
-// Photos in public/foods (CC0, see CREDITS.txt): catalog key → file, plus near matches.
-const PHOTOS = new Set([
-  "apple", "banana", "basil", "bell pepper", "berries", "bread", "broccoli", "canned tomatoes", "carrot", "cheese", "chicken",
-  "cilantro", "cream", "cucumber", "egg", "feta", "garlic", "green beans", "ground beef", "kefir", "lemon", "lettuce", "milk",
-  "mozzarella", "mushroom", "oats", "onion", "pasta", "pear", "pork", "potato", "rice", "salmon", "spinach", "sweet potato",
-  "tomato", "tortilla", "yogurt", "zucchini",
-]);
-const PHOTO_ALIAS: Record<string, string> = {
-  lime: "lemon", "spring onion": "onion", parsley: "cilantro", dill: "cilantro", turkey: "chicken", beef: "ground beef",
-  noodles: "pasta", pita: "tortilla", cabbage: "lettuce", "tomato paste": "canned tomatoes", "cream cheese": "cheese",
-};
-
-/** A photo of the food itself, or of its category when the food has none. */
-export function foodPhoto(category: Category, name?: string): string {
-  const key = name ? matchCatalog(name)?.key : undefined;
-  const photo = key && (PHOTOS.has(key) ? key : PHOTO_ALIAS[key]);
-  return `/foods/${photo ? photo.replace(/ /g, "-") : `cat-${category}`}.webp`;
-}
-
 export function CategoryIcon({ category, name, className }: { category: Category; name?: string; className?: string }) {
   const key = name ? matchCatalog(name)?.key : undefined;
   const Icon = (key && FOOD_ICONS[key]) || ICONS[category];
