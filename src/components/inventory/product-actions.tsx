@@ -13,7 +13,7 @@ import { Sheet } from "@/components/ui/sheet";
 import { useAction } from "@/components/ui/toast";
 import { useProductSheet } from "@/components/app/product-sheet";
 import { useSavi } from "@/components/savi/savi-companion";
-import { useT } from "@/components/i18n/lang-provider";
+import { useLang, useT } from "@/components/i18n/lang-provider";
 import { daysBetween } from "@/lib/domain/dates";
 
 /** A use within the use-soon window counts as a rescue (mirrors the database rule). */
@@ -258,6 +258,7 @@ function UseSheet({ product, today, open, onClose }: { product: Product; today: 
 }
 
 function DiscardSheet({ product, today, open, onClose }: { product: Product; today: string; open: boolean; onClose: () => void }) {
+  const lang = useLang();
   const amount = useAmount(product);
   const [reason, setReason] = useState<WasteReason>(product.expires_on < today ? "expired" : "spoiled");
   const [date, setDate] = useState(today);
@@ -325,7 +326,7 @@ function DiscardSheet({ product, today, open, onClose }: { product: Product; tod
         </Field>
         {cost !== null && (
           <p className="rounded-lg bg-paper-deep/70 px-4 py-3 text-sm text-ink-2">
-            {t("Logged value:")} <strong className="font-medium tabular text-ink">{formatMoney(cost)}</strong>{t(", based on the price you entered.")}
+            {t("Logged value:")} <strong className="font-medium tabular text-ink">{formatMoney(cost, lang)}</strong>{t(", based on the price you entered.")}
           </p>
         )}
       </div>

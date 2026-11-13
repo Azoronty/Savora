@@ -1,14 +1,17 @@
 import { CURRENCY, UNIT_LABEL, type Unit } from "./constants";
 
 const quantityFormat = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
-const moneyFormat = new Intl.NumberFormat("en-US", { style: "currency", currency: CURRENCY });
+const moneyFormats = {
+  en: new Intl.NumberFormat("en-US", { style: "currency", currency: CURRENCY }),
+  ru: new Intl.NumberFormat("ru-RU", { style: "currency", currency: CURRENCY }),
+};
 
 export function formatQuantity(quantity: number, unit: Unit): string {
   return `${quantityFormat.format(quantity)} ${UNIT_LABEL[unit]}`;
 }
 
-export function formatMoney(cents: number): string {
-  return moneyFormat.format(cents / 100);
+export function formatMoney(cents: number, lang: "en" | "ru" = "en"): string {
+  return moneyFormats[lang].format(cents / 100);
 }
 
 /** "3.49" → 349. Returns null for empty input; NaN signals invalid input. */

@@ -78,9 +78,9 @@ export default async function PlanPage({ searchParams }: { searchParams: Promise
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="min-w-0">
             <section aria-label={t("Plan impact")} className="grid grid-cols-2 overflow-hidden rounded-xl border border-line bg-card lg:grid-cols-4">
-              <Stat label={t("Reach their date this week")} value={String(plan.atRisk.length)} note={plan.atRiskValueCents ? t("{money} of food", { money: formatMoney(plan.atRiskValueCents) }) : t("without a plan")} />
+              <Stat label={t("Reach their date this week")} value={String(plan.atRisk.length)} note={plan.atRiskValueCents ? t("{money} of food", { money: formatMoney(plan.atRiskValueCents, lang) }) : t("without a plan")} />
               <Stat label={t("Used in time with this plan")} value={String(plan.saved.length)} note={t("{p}% of them", { p: Math.round((plan.saved.length / plan.atRisk.length) * 100) })} tone="fresh" />
-              <Stat label={t("Kept out of the bin")} value={plan.savedValueCents ? formatMoney(plan.savedValueCents) : "—"} note={t(plan.savedValueCents ? "from prices you entered" : "add prices to see value")} />
+              <Stat label={t("Kept out of the bin")} value={plan.savedValueCents ? formatMoney(plan.savedValueCents, lang) : "—"} note={t(plan.savedValueCents ? "from prices you entered" : "add prices to see value")} />
               <Stat label={t("Need another rescue")} value={String(lost)} note={t(lost ? "see the steps below" : "nothing left over")} tone={lost ? "soon" : undefined} />
             </section>
 

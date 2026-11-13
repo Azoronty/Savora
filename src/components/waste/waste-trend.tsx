@@ -35,7 +35,7 @@ export function WasteTrend({ weeks }: { weeks: Week[] }) {
                   <p className="font-medium text-ink">{t("Week of")} {formatShortDate(w.weekStart, lang)}</p>
                   <p className="text-ink-2">
                     {t(w.count === 1 ? "1 item" : `${w.count} items`)}
-                    {w.costCents > 0 && ` · ${formatMoney(w.costCents)}`}
+                    {w.costCents > 0 && ` · ${formatMoney(w.costCents, lang)}`}
                   </p>
                 </div>
               );

@@ -158,7 +158,7 @@ export function WasteLogList({ records }: { records: WasteRecord[] }) {
           </div>
           <div className="text-right">
             <p className="font-mono text-[0.8125rem] tabular">{formatShortDate(r.discarded_on, lang)}</p>
-            <p className="text-[0.8125rem] text-muted tabular">{r.cost_cents !== null ? formatMoney(r.cost_cents) : t("No price")}</p>
+            <p className="text-[0.8125rem] text-muted tabular">{r.cost_cents !== null ? formatMoney(r.cost_cents, lang) : t("No price")}</p>
           </div>
           <button
             type="button"

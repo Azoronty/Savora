@@ -43,7 +43,7 @@ export default async function WastePage() {
             <Figure label={t("Items logged")} value={String(stats.count)} note={t("Last 6 months")} />
             <Figure
               label={t("Logged value")}
-              value={formatMoney(stats.costCents)}
+              value={formatMoney(stats.costCents, lang)}
               note={stats.entriesWithCost === stats.count ? t("All entries priced") : t("From {a} of {b} entries with a price", { a: stats.entriesWithCost, b: stats.count })}
             />
             <Figure
@@ -80,7 +80,7 @@ export default async function WastePage() {
                       <tr key={w.weekStart} className="border-t border-line">
                         <td className="py-1.5">{formatShortDate(w.weekStart, lang)}</td>
                         <td className="py-1.5 text-right">{w.count}</td>
-                        <td className="py-1.5 text-right">{formatMoney(w.costCents)}</td>
+                        <td className="py-1.5 text-right">{formatMoney(w.costCents, lang)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -100,7 +100,7 @@ export default async function WastePage() {
                       <span>{t(CATEGORY_LABEL[c.category])}</span>
                       <span className="text-ink-2 tabular">
                         {c.count}
-                        {c.costCents > 0 && <span className="text-muted"> · {formatMoney(c.costCents)}</span>}
+                        {c.costCents > 0 && <span className="text-muted"> · {formatMoney(c.costCents, lang)}</span>}
                       </span>
                     </div>
                     <div className="h-2 rounded-full bg-paper-deep" aria-hidden="true">

@@ -130,7 +130,7 @@ export default async function PredictPage() {
                       <td className="px-4 py-3">{x.lastBought ? formatShortDate(x.lastBought, lang) : "—"}</td>
                       <td className="px-4 py-3">
                         {pct(x.wasteShare)}
-                        {x.wastedValueCents ? <span className="block text-xs text-muted">{t("{money} recorded", { money: formatMoney(x.wastedValueCents) })}</span> : null}
+                        {x.wastedValueCents ? <span className="block text-xs text-muted">{t("{money} recorded", { money: formatMoney(x.wastedValueCents, lang) })}</span> : null}
                       </td>
                       <td className="px-4 py-3">{x.daysToUse === null ? "—" : t("{n} days", { n: Math.round(x.daysToUse) })}</td>
                       <td className="px-4 py-3">{t(x.enoughData ? x.confidence : "Not enough data")}</td>

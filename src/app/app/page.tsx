@@ -92,7 +92,7 @@ export default async function DashboardPage() {
           href="/app/waste"
           label={t("Waste this month")}
           value={wasteStats.thisMonth.count}
-          note={wasteStats.thisMonth.costCents > 0 ? t("{money} logged value", { money: formatMoney(wasteStats.thisMonth.costCents) }) : t("Items logged")}
+          note={wasteStats.thisMonth.costCents > 0 ? t("{money} logged value", { money: formatMoney(wasteStats.thisMonth.costCents, lang) }) : t("Items logged")}
           icon={<Recycle className="size-4" />}
         />
       </section>
