@@ -4,6 +4,7 @@ import { addDays } from "@/lib/domain/dates";
 import { USE_SOON_DAYS, type Category, type Storage } from "@/lib/domain/constants";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/lib/supabase/database.types";
+import { nameAliases } from "@/lib/i18n/core";
 import type { Viewer } from "./session";
 
 const PRODUCT_COLUMNS =
@@ -43,7 +44,11 @@ export const listProducts = cache(async (viewer: Viewer, query: InventoryQuery =
   const supabase = await createClient();
   let request = supabase.from("products").select(PRODUCT_COLUMNS).eq("household_id", viewer.householdId);
 
-  if (query.q) request = request.ilike("name", likePattern(query.q));
+  if (query.q) {
+    // Also match the name in the other language; the OR filter is built only from safe characters.
+    const terms = /^[\p{L}\d -]+$/u.test(query.q) ? [query.q, ...nameAliases(query.q)] : [];
+    request = terms.length > 1 ? request.or(terms.map((t) => `name.ilike.%${t}%`).join(",")) : request.ilike("name", likePattern(query.q));
+  }
   if (query.category) request = request.eq("category", query.category);
   if (query.storage) request = request.eq("storage", query.storage);
 

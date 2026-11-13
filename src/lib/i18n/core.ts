@@ -36,6 +36,15 @@ for (const entry of CATALOG) {
   FOOD[entry.label.toLowerCase()] = ru.toLowerCase();
 }
 
+// The way back, for English mode: Russian names people typed ("Молоко") → "Milk".
+const EN: Record<string, string> = {};
+for (const [en, ru] of [...Object.entries(RU), ...Object.entries(FOOD)]) {
+  if (typeof ru !== "string" || en.includes("{")) continue;
+  EN[ru] = en;
+  EN[ru.toLowerCase()] = en.toLowerCase();
+}
+const CYRILLIC = /[а-яё]/i;
+
 const PATTERNS = Object.entries(RU)
   .filter(([k]) => k.includes("{"))
   .map(([key, entry]) => {
@@ -49,7 +58,7 @@ const PATTERNS = Object.entries(RU)
         return "(.+?)";
       })
       .join("");
-    return { re: new RegExp(`^${source}$`, "s"), names, entry, literal: key.replace(/\{\w+\}/g, "").length };
+    return { key, re: new RegExp(`^${source}$`, "s"), names, entry, literal: key.replace(/\{\w+\}/g, "").length };
   })
   // Most literal text first, so the most specific sentence wins over "{name} ({when})".
   .sort((a, b) => b.literal - a.literal);
@@ -67,6 +76,12 @@ function quantity(v: string): string | null {
 
 /** Translate a value captured from a sentence: a known word, a food, a quantity, a list "a, b and c", or a nested sentence. */
 function value(lang: Lang, v: string): string {
+  if (lang === "en") {
+    if (EN[v]) return EN[v];
+    const parts = v.split(/, | and | и /);
+    if (parts.length > 1) return parts.map((p) => value(lang, p)).join(", ").replace(/, ([^,]*)$/, " and $1");
+    return translate(lang, v);
+  }
   const hit = RU[v] ?? FOOD[v];
   if (typeof hit === "string") return hit;
   // Lower-cased titles ("for tomato pasta"): look up "Tomato pasta", keep it lower case.
@@ -86,7 +101,19 @@ function value(lang: Lang, v: string): string {
 export function translate(lang: Lang, text: string, vars?: Vars): string {
   const v: Record<string, string> = {};
   if (vars) for (const [k, val] of Object.entries(vars)) v[k] = String(val);
-  if (lang === "en") return vars ? fill(text, v) : text;
+  if (lang === "en") {
+    // English is the source; only Russian names inside it need translating back.
+    if (vars || !CYRILLIC.test(text)) return vars ? fill(text, v) : text;
+    if (EN[text]) return EN[text];
+    for (const p of PATTERNS) {
+      const m = p.re.exec(text);
+      if (!m) continue;
+      const captured: Record<string, string> = {};
+      p.names.forEach((name, i) => (captured[name] = value(lang, m[i + 1])));
+      return fill(p.key, captured);
+    }
+    return text;
+  }
 
   const exact = RU[text];
   if (exact !== undefined) return render(exact, v);
@@ -104,6 +131,23 @@ export function translate(lang: Lang, text: string, vars?: Vars): string {
 }
 
 export const makeT = (lang: Lang): T => (text, vars) => translate(lang, text, vars);
+
+const SAFE_TERM = /^[\p{L}\d %-]+$/u;
+/**
+ * The same food in the other language, so search finds "Whole milk" for «молоко»
+ * and «Молоко» for "milk". Short names only; safe characters for a PostgREST filter.
+ */
+export function nameAliases(q: string): string[] {
+  const s = q.trim().toLowerCase();
+  if (s.length < 2) return [];
+  const out = new Set<string>();
+  for (const [ru, en] of Object.entries(EN)) {
+    if (ru !== ru.toLowerCase() || en.split(" ").length > 3) continue;
+    if (ru.includes(s)) out.add(en);
+    else if (en.includes(s)) out.add(ru);
+  }
+  return [...out].filter((t) => SAFE_TERM.test(t) && !t.includes("%")).slice(0, 12);
+}
 
 /** Locale for Intl formatters. */
 export const intlLocale = (lang: Lang) => (lang === "ru" ? "ru-RU" : "en-GB");

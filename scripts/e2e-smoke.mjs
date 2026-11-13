@@ -246,8 +246,9 @@ await step("quick add: one sentence becomes several products", async () => {
   if ((await rows.count()) !== 3) throw new Error(`expected 3 parsed items, got ${await rows.count()}`);
   await page.getByRole("button", { name: "Add 3 products" }).click();
   await toast("3 products added");
-  await go(`/app/inventory?q=${encodeURIComponent("Молоко")}`);
-  await page.getByText("Молоко").first().waitFor();
+  // Stored as «Молоко»; the English UI shows it as "Milk", and an English search finds it.
+  await go(`/app/inventory?q=milk`);
+  await page.locator("main li[data-savi-product='Молоко']").getByText("Milk", { exact: true }).waitFor();
 });
 
 await step("Savi demo level-up moves to the next stage", async () => {

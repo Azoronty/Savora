@@ -1,13 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 import { planWeek, reminderText, type PlanItem } from "@/lib/domain/plan";
+import { makeT } from "@/lib/i18n/core";
 import { pushConfigured, sendPush, type PushTarget } from "@/lib/push";
 import type { Database } from "@/lib/supabase/database.types";
 import { supabaseEnv } from "@/lib/supabase/env";
 
 export const dynamic = "force-dynamic";
 
-type Due = { user_id: string; local_date: string; subscriptions: PushTarget[]; products: PlanItem[] };
+type Due = { user_id: string; lang?: string; local_date: string; subscriptions: PushTarget[]; products: PlanItem[] };
 
 /**
  * Called every hour by the database (pg_cron + pg_net). Finds people whose
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
   const due = (data ?? []) as unknown as Due[];
   let sent = 0;
   for (const person of due) {
-    const text = reminderText(planWeek(person.products, person.local_date));
+    const text = reminderText(planWeek(person.products, person.local_date), makeT(person.lang === "ru" ? "ru" : "en"));
     const results = await sendPush(person.subscriptions, text);
     for (const r of results) if (r.gone) await db.rpc("reminder_prune", { p_secret: secret, p_endpoint: r.endpoint });
     const delivered = results.filter((r) => r.ok).length;

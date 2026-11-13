@@ -5,7 +5,7 @@ import { formatQuantity } from "@/lib/domain/format";
 import type { Product } from "@/lib/data/queries";
 import type { WasteRisk } from "@/lib/domain/predict";
 import { cx } from "@/lib/cx";
-import { CategoryIcon } from "@/components/ui/category-icon";
+import { CategoryIcon, foodPhoto } from "@/components/ui/category-icon";
 import { FreshnessBar, StatusPill } from "@/components/ui/status";
 import { ProductActions } from "./product-actions";
 import { DateText, Tx } from "@/components/i18n/lang-provider";
@@ -26,8 +26,18 @@ export function ProductRow({ product, today, risk }: { product: Product; today: 
   return (
     <li data-savi-product={product.name} className="group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-4 py-3.5 transition-colors hover:bg-white/60 sm:grid-cols-[auto_minmax(0,1fr)_8.5rem_7rem_auto] sm:px-5">
       <CategoryIcon category={product.category} name={product.name} />
-      <div className="min-w-0">
-        <div className="flex items-center gap-2">
+      <div className="relative min-w-0 [text-shadow:0_0_3px_var(--color-card),0_0_10px_var(--color-card)]">
+        {/* Photo of the food, fading into the row on both sides; decorative. */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- small decorative photo, lazy */}
+        <img
+          src={foodPhoto(product.category, product.name)}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+          className="pointer-events-none absolute -bottom-3.5 -top-3.5 right-0 h-[calc(100%+1.75rem)] w-32 object-cover opacity-80 [mask-image:linear-gradient(to_right,transparent,#000_55%,#000_70%,transparent)] sm:w-52 sm:opacity-90 sm:[mask-image:linear-gradient(to_right,transparent,#000_40%,#000_65%,transparent)] lg:w-64"
+        />
+        <div className="relative flex items-center gap-2">
           <p className="truncate font-medium"><Tx>{product.name}</Tx></p>
           {product.is_demo && <SampleTag />}
           {risk && (
@@ -43,7 +53,7 @@ export function ProductRow({ product, today, risk }: { product: Product; today: 
             </span>
           )}
         </div>
-        <p className="mt-0.5 flex items-center gap-1.5 truncate text-[0.8125rem] text-muted">
+        <p className="relative mt-0.5 flex items-center gap-1.5 truncate text-[0.8125rem] text-muted">
           <span className="tabular"><Tx>{formatQuantity(Number(product.quantity), product.unit)}</Tx></span>
           <span aria-hidden="true">·</span>
           <StorageIcon className="size-3.5 shrink-0" aria-hidden="true" />
@@ -52,7 +62,7 @@ export function ProductRow({ product, today, risk }: { product: Product; today: 
           <span className="hidden md:inline"><Tx>{CATEGORY_LABEL[product.category]}</Tx></span>
         </p>
         {/* Mobile: date + status under the name */}
-        <p className="mt-1.5 flex items-center gap-2 text-[0.8125rem] sm:hidden">
+        <p className="relative mt-1.5 flex items-center gap-2 text-[0.8125rem] sm:hidden">
           <StatusPill status={expiry.status} />
           <span className={cx("tabular", expiry.status === "fresh" ? "text-muted" : "text-ink-2")}><Tx>{expiry.label}</Tx></span>
         </p>

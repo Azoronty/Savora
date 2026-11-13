@@ -150,4 +150,6 @@ export const SHELL: Record<string, Entry> = {
   "Demo kitchen": "Демо-кухня",
   "My kitchen": "Моя кухня",
   "Our kitchen": "Наша кухня",
+  "Savora: use food before its date": "Savora: используй еду до конца срока",
+  "Track the food you have, cook it before its date, waste less.": "Следите за продуктами, готовьте их до конца срока, выбрасывайте меньше.",
 };

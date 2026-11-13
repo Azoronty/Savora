@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { planWeek, reminderText } from "@/lib/domain/plan";
-import { getT } from "@/lib/i18n/server";
+import { getLang, getT } from "@/lib/i18n/server";
 import { pushConfigured, sendPush } from "@/lib/push";
 import { actionContext } from "./context";
 import { dbError, notSignedIn, ok, type ActionResult } from "./result";
@@ -23,6 +23,8 @@ export async function savePushSubscription(input: z.input<typeof subscriptionSch
   const { endpoint, p256dh, auth, userAgent } = parsed.data;
   const { error } = await ctx.supabase.rpc("save_push_subscription", { p_endpoint: endpoint, p_p256dh: p256dh, p_auth: auth, p_user_agent: userAgent });
   if (error) return dbError(error);
+  // The daily push is written in the language the person uses now.
+  await ctx.supabase.from("profiles").update({ lang: await getLang() }).eq("id", ctx.viewer.userId);
   revalidatePath("/app/plan");
   return ok(undefined, "Reminders are on for this device");
 }

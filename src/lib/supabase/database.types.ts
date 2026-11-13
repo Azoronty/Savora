@@ -254,6 +254,7 @@ export type Database = {
           display_name: string | null
           household_id: string
           id: string
+          lang: string
           onboarded_at: string | null
           reminder_hour: number
           savi_mode: Database["public"]["Enums"]["savi_mode"]
@@ -265,6 +266,7 @@ export type Database = {
           display_name?: string | null
           household_id: string
           id: string
+          lang?: string
           onboarded_at?: string | null
           reminder_hour?: number
           savi_mode?: Database["public"]["Enums"]["savi_mode"]
@@ -276,6 +278,7 @@ export type Database = {
           display_name?: string | null
           household_id?: string
           id?: string
+          lang?: string
           onboarded_at?: string | null
           reminder_hour?: number
           savi_mode?: Database["public"]["Enums"]["savi_mode"]

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { plural, translate } from "./core";
+import { nameAliases, plural, translate } from "./core";
 
 const ru = (s: string, v?: Record<string, string | number>) => translate("ru", s, v);
 
@@ -24,5 +24,25 @@ describe("i18n", () => {
   it("translates quantities", () => {
     expect(ru("2 pcs")).toBe("2 шт");
     expect(ru("1.5 kg")).toBe("1,5 кг");
+  });
+});
+
+describe("English mode", () => {
+  const en = (s: string) => translate("en", s);
+  it("translates Russian names people typed back to English", () => {
+    expect(en("Молоко")).toBe("Milk");
+    expect(en("Last chance for молоко and шпинат.")).toBe("Last chance for milk and spinach.");
+  });
+  it("leaves English and unknown names alone", () => {
+    expect(en("Rescue plan")).toBe("Rescue plan");
+    expect(en("Борщ бабушки")).toBe("Борщ бабушки");
+  });
+});
+
+describe("search aliases", () => {
+  it("finds the food in the other language", () => {
+    expect(nameAliases("молоко")).toContain("milk");
+    expect(nameAliases("milk")).toContain("молоко");
+    expect(nameAliases("x")).toEqual([]);
   });
 });
